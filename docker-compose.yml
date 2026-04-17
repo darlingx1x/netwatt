@@ -1,0 +1,93 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: netwatt_postgres
+    environment:
+      POSTGRES_USER: netwatt
+      POSTGRES_PASSWORD: netwatt
+      POSTGRES_DB: netwatt
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U netwatt"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: netwatt_nats
+    command: ["-js", "-sd", "/data"]
+    volumes:
+      - nats_data:/data
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: adminer:4-standalone
+    container_name: netwatt_adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    container_name: netwatt_backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://netwatt:netwatt@postgres:5432/netwatt
+      NATS_URL: nats://nats:4222
+      CORS_ORIGINS: '["http://localhost:5173"]'
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+      target: dev
+    container_name: netwatt_worker
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://netwatt:netwatt@postgres:5432/netwatt
+      NATS_URL: nats://nats:4222
+    volumes:
+      - ./backend:/app
+    command: ["python", "-c", "print('worker placeholder — real entrypoint in Block B'); import time; time.sleep(1e9)"]
+    depends_on:
+      - backend
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: netwatt_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  nats_data:
