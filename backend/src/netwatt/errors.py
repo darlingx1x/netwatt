@@ -5,15 +5,15 @@ class NetWattError(Exception):
     pass
 
 
-class NotFound(NetWattError):
+class NotFoundError(NetWattError):
     pass
 
 
-class PermissionDenied(NetWattError):
+class PermissionDeniedError(NetWattError):
     pass
 
 
-class ValidationFailed(NetWattError):
+class ValidationFailedError(NetWattError):
     pass
 
 
