@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<title>{{ t.report_title }}</title>
+<style>
+  @page { size: A4; margin: 2cm 1.5cm; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; color: #222; }
+  h1 { font-size: 20pt; border-bottom: 2px solid #1e3a8a; padding-bottom: 4pt; color: #1e3a8a; }
+  h2 { font-size: 14pt; color: #1e3a8a; margin-top: 18pt; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8pt; }
+  th, td { border: 1px solid #ccc; padding: 4pt 6pt; text-align: left; font-size: 9.5pt; }
+  th { background: #eff6ff; color: #1e3a8a; }
+  .kpi-grid { display: flex; gap: 10pt; margin: 12pt 0; }
+  .kpi { flex: 1; padding: 10pt; border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 4pt; }
+  .kpi .label { font-size: 9pt; color: #64748b; text-transform: uppercase; }
+  .kpi .value { font-size: 16pt; font-weight: bold; color: #1e3a8a; margin-top: 4pt; }
+  .kpi .unit { font-size: 9pt; color: #64748b; margin-left: 4pt; }
+  .meta { color: #64748b; font-size: 9pt; margin-bottom: 12pt; }
+  .legal { font-size: 8.5pt; color: #475569; margin-top: 16pt; padding: 8pt; background: #f8fafc; border-left: 3pt solid #1e3a8a; }
+</style>
+</head>
+<body>
+<h1>{{ t.report_title }}</h1>
+<div class="meta">
+  {{ t.report_prepared }} {{ generated_at }} · {{ t.scenario }}: <strong>{{ scenario.name }}</strong>
+  <br>{{ t.owner }}: {{ owner.full_name }} ({{ owner.email }})
+</div>
+
+<h2>{{ t.kpi_section }}</h2>
+<div class="kpi-grid">
+  <div class="kpi">
+    <div class="label">{{ t.kpi_savings_kwh }}</div>
+    <div class="value">{{ "{:,.0f}".format(result.savings_kwh) }}<span class="unit">{{ t.unit_kwh_year }}</span></div>
+  </div>
+  <div class="kpi">
+    <div class="label">{{ t.kpi_savings_money }}</div>
+    <div class="value">{{ "{:,.0f}".format(result.savings_money) }}<span class="unit">{{ t.unit_uzs_year }}</span></div>
+  </div>
+  <div class="kpi">
+    <div class="label">{{ t.kpi_co2 }}</div>
+    <div class="value">{{ "{:,.1f}".format(result.co2_saved_kg) }}<span class="unit">{{ t.unit_kg_year }}</span></div>
+  </div>
+</div>
+
+<h2>{{ t.inputs_section }}</h2>
+<table>
+  <tr><th>{{ t.param }}</th><th>{{ t.value }}</th></tr>
+  <tr><td>{{ t.tariff_day }}</td><td>{{ scenario.tariff.day }} UZS/{{ t.unit_kwh }}</td></tr>
+  <tr><td>{{ t.tariff_peak }}</td><td>{{ scenario.tariff.peak }} UZS/{{ t.unit_kwh }}</td></tr>
+  <tr><td>{{ t.tariff_night }}</td><td>{{ scenario.tariff.night }} UZS/{{ t.unit_kwh }}</td></tr>
+  <tr><td>{{ t.day_util }}</td><td>{{ "{:.1%}".format(scenario.traffic.day_util) }}</td></tr>
+  <tr><td>{{ t.peak_util }}</td><td>{{ "{:.1%}".format(scenario.traffic.peak_util) }}</td></tr>
+  <tr><td>{{ t.night_util }}</td><td>{{ "{:.1%}".format(scenario.traffic.night_util) }}</td></tr>
+  <tr><td>{{ t.ef_grid }}</td><td>{{ scenario.ef_grid }} {{ t.unit_kg_per_kwh }}</td></tr>
+</table>
+
+<h2>{{ t.policies_section }}</h2>
+<table>
+  <tr><th>{{ t.policy }}</th><th>{{ t.status }}</th><th>ΔE, {{ t.unit_kwh_year }}</th></tr>
+  <tr><td>IEEE 802.3az (EEE)</td><td>{% if policies.eee.enabled %}✓{% else %}—{% endif %}</td><td>{{ "{:,.0f}".format(result.breakdown.eee) }}</td></tr>
+  <tr><td>Adaptive Link Rate</td><td>{% if policies.alr.enabled %}✓{% else %}—{% endif %}</td><td>{{ "{:,.0f}".format(result.breakdown.alr) }}</td></tr>
+  <tr><td>PoE Scheduling</td><td>{% if policies.poe_sched.enabled %}✓{% else %}—{% endif %}</td><td>{{ "{:,.0f}".format(result.breakdown.poe) }}</td></tr>
+  <tr><td>Server Consolidation</td><td>{% if policies.consolidation.enabled %}✓{% else %}—{% endif %}</td><td>{{ "{:,.0f}".format(result.breakdown.consolidation) }}</td></tr>
+</table>
+
+<h2>{{ t.per_device_section }}</h2>
+<table>
+  <tr>
+    <th>{{ t.vendor }}</th>
+    <th>{{ t.model }}</th>
+    <th>{{ t.qty }}</th>
+    <th>E_base, {{ t.unit_kwh_year }}</th>
+    <th>E_opt, {{ t.unit_kwh_year }}</th>
+    <th>ΔE, {{ t.unit_kwh_year }}</th>
+  </tr>
+  {% for d in result.per_device %}
+  <tr>
+    <td>{{ d.vendor }}</td>
+    <td>{{ d.model }}</td>
+    <td>{{ d.quantity }}</td>
+    <td>{{ "{:,.0f}".format(d.e_base_kwh) }}</td>
+    <td>{{ "{:,.0f}".format(d.e_optimized_kwh) }}</td>
+    <td>{{ "{:,.0f}".format(d.delta_total_kwh) }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<div class="legal">
+  <strong>{{ t.legal_title }}</strong><br>
+  {{ t.legal_text }}
+</div>
+</body>
+</html>

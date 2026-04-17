@@ -8,6 +8,8 @@ from sqlalchemy import text
 from netwatt.auth.router import router as auth_router
 from netwatt.catalog.router import router as catalog_router
 from netwatt.db import SessionLocal
+from netwatt.reports.router import router as reports_router
+from netwatt.scenarios.router import router as scenarios_router
 from netwatt.settings import settings
 
 
@@ -28,6 +30,8 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(catalog_router)
+app.include_router(scenarios_router)
+app.include_router(reports_router)
 
 
 @app.get("/healthz")
