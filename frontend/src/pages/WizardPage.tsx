@@ -28,12 +28,21 @@ interface SelectedItem {
   quantity: number
 }
 
-const presets = {
+interface TrafficShape {
+  day_util: number
+  peak_util: number
+  night_util: number
+  day_hours: number
+  peak_hours: number
+  night_hours: number
+}
+
+const presets: Record<string, TrafficShape> = {
   office_8x5: { day_util: 0.35, peak_util: 0.7, night_util: 0.05, day_hours: 6, peak_hours: 2, night_hours: 16 },
   datacenter_24x7: { day_util: 0.5, peak_util: 0.85, night_util: 0.4, day_hours: 10, peak_hours: 4, night_hours: 10 },
   campus: { day_util: 0.4, peak_util: 0.75, night_util: 0.1, day_hours: 8, peak_hours: 3, night_hours: 13 },
   industrial: { day_util: 0.6, peak_util: 0.85, night_util: 0.3, day_hours: 16, peak_hours: 4, night_hours: 4 },
-} as const
+}
 
 type PresetKey = keyof typeof presets
 
@@ -62,8 +71,9 @@ export default function WizardPage() {
   })
 
   // Step 3
-  const [preset, setPreset] = useState<PresetKey>('office_8x5')
-  const traffic = presets[preset]
+  const [preset, setPreset] = useState<PresetKey | 'custom'>('office_8x5')
+  const [customTraffic, setCustomTraffic] = useState({ ...presets.office_8x5 })
+  const traffic = preset === 'custom' ? customTraffic : presets[preset]
   const [tariff, setTariff] = useState({ day: 1050, peak: 1450, night: 450 })
 
   // Step 4
@@ -109,9 +119,10 @@ export default function WizardPage() {
       await api.post(`/scenarios/${scenario.id}/calculate`)
       setSubmitStatus('success')
       setTimeout(() => nav(`/scenarios/${scenario.id}`), 400)
-    } catch (e: any) {
+    } catch (e) {
       setSubmitStatus('idle')
-      setError(e?.response?.data?.detail ?? 'error')
+      const err = e as { response?: { data?: { detail?: string } } }
+      setError(err?.response?.data?.detail ?? 'error')
     }
   }
 
@@ -284,7 +295,7 @@ export default function WizardPage() {
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm text-muted-foreground mb-1 block">{t('wizard.traffic_preset')}</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 {(Object.keys(presets) as PresetKey[]).map((k) => (
                   <Button
                     key={k}
@@ -294,34 +305,58 @@ export default function WizardPage() {
                     {k}
                   </Button>
                 ))}
+                <Button
+                  variant={preset === 'custom' ? 'default' : 'outline'}
+                  onClick={() => setPreset('custom')}
+                >
+                  custom
+                </Button>
               </div>
             </div>
             <Separator />
             <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{t('wizard.day_util')}</label>
-                <Input value={traffic.day_util} disabled />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{t('wizard.peak_util')}</label>
-                <Input value={traffic.peak_util} disabled />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{t('wizard.night_util')}</label>
-                <Input value={traffic.night_util} disabled />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{t('wizard.day_hours')}</label>
-                <Input value={traffic.day_hours} disabled />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{t('wizard.peak_hours')}</label>
-                <Input value={traffic.peak_hours} disabled />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{t('wizard.night_hours')}</label>
-                <Input value={traffic.night_hours} disabled />
-              </div>
+              <TrafficField
+                label={t('wizard.day_util')}
+                value={traffic.day_util}
+                disabled={preset !== 'custom'}
+                onChange={(v) => setCustomTraffic({ ...customTraffic, day_util: v })}
+                step={0.05}
+              />
+              <TrafficField
+                label={t('wizard.peak_util')}
+                value={traffic.peak_util}
+                disabled={preset !== 'custom'}
+                onChange={(v) => setCustomTraffic({ ...customTraffic, peak_util: v })}
+                step={0.05}
+              />
+              <TrafficField
+                label={t('wizard.night_util')}
+                value={traffic.night_util}
+                disabled={preset !== 'custom'}
+                onChange={(v) => setCustomTraffic({ ...customTraffic, night_util: v })}
+                step={0.05}
+              />
+              <TrafficField
+                label={t('wizard.day_hours')}
+                value={traffic.day_hours}
+                disabled={preset !== 'custom'}
+                onChange={(v) => setCustomTraffic({ ...customTraffic, day_hours: v })}
+                step={1}
+              />
+              <TrafficField
+                label={t('wizard.peak_hours')}
+                value={traffic.peak_hours}
+                disabled={preset !== 'custom'}
+                onChange={(v) => setCustomTraffic({ ...customTraffic, peak_hours: v })}
+                step={1}
+              />
+              <TrafficField
+                label={t('wizard.night_hours')}
+                value={traffic.night_hours}
+                disabled={preset !== 'custom'}
+                onChange={(v) => setCustomTraffic({ ...customTraffic, night_hours: v })}
+                step={1}
+              />
             </div>
             <Separator />
             <div className="grid grid-cols-3 gap-3">
@@ -477,6 +512,33 @@ export default function WizardPage() {
           />
         )}
       </div>
+    </div>
+  )
+}
+
+function TrafficField({
+  label,
+  value,
+  onChange,
+  disabled,
+  step,
+}: {
+  label: string
+  value: number
+  onChange: (v: number) => void
+  disabled: boolean
+  step: number
+}) {
+  return (
+    <div>
+      <label className="text-xs text-muted-foreground mb-1 block">{label}</label>
+      <Input
+        type="number"
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        disabled={disabled}
+      />
     </div>
   )
 }

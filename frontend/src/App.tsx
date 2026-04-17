@@ -10,6 +10,7 @@ import WizardPage from '@/pages/WizardPage'
 import ScenarioResultPage from '@/pages/ScenarioResultPage'
 import AdminUsersPage from '@/pages/AdminUsersPage'
 import AdminEquipmentPage from '@/pages/AdminEquipmentPage'
+import CompareScenariosPage from '@/pages/CompareScenariosPage'
 
 const qc = new QueryClient({
   defaultOptions: {
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/scenarios" element={<ScenariosPage />} />
             <Route path="/scenarios/new" element={<WizardPage />} />
+            <Route path="/scenarios/compare" element={<CompareScenariosPage />} />
             <Route path="/scenarios/:id" element={<ScenarioResultPage />} />
             <Route path="/catalog" element={<CatalogPage />} />
             <Route

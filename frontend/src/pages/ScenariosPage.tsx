@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/api/client'
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
-import { Plus, FolderKanban } from 'lucide-react'
+import { Plus, FolderKanban, GitCompare } from 'lucide-react'
 
 interface Scenario {
   id: number
@@ -15,7 +16,8 @@ interface Scenario {
   status: 'draft' | 'calculating' | 'ready' | 'failed'
   created_at: string
   notes: string | null
-  result: { savings_kwh: string } | null
+  owner_id: number
+  result: { savings_kwh: string; savings_money: string } | null
 }
 
 const statusVariant: Record<Scenario['status'], 'default' | 'secondary' | 'outline' | 'destructive'> = {
@@ -27,21 +29,45 @@ const statusVariant: Record<Scenario['status'], 'default' | 'secondary' | 'outli
 
 export default function ScenariosPage() {
   const { t } = useTranslation()
+  const nav = useNavigate()
   const { data, isLoading } = useQuery({
     queryKey: ['scenarios'],
     queryFn: async () => (await api.get<Scenario[]>('/scenarios')).data,
   })
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+
+  function toggle(id: number) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <h1 className="text-3xl font-semibold tracking-tight">{t('scenarios.heading')}</h1>
-        <Link to="/scenarios/new">
-          <Button>
-            <Plus className="w-4 h-4 mr-1" />
-            {t('scenarios.new')}
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          {selected.size >= 2 && (
+            <Button
+              variant="outline"
+              onClick={() =>
+                nav(`/scenarios/compare?ids=${Array.from(selected).slice(0, 4).join(',')}`)
+              }
+            >
+              <GitCompare className="w-4 h-4 mr-1" />
+              Сравнить ({selected.size})
+            </Button>
+          )}
+          <Link to="/scenarios/new">
+            <Button>
+              <Plus className="w-4 h-4 mr-1" />
+              {t('scenarios.new')}
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {isLoading && <Spinner />}
@@ -60,32 +86,60 @@ export default function ScenariosPage() {
 
       {!isLoading && data && data.length > 0 && (
         <div className="grid gap-3 md:grid-cols-2">
-          {data.map((s) => (
-            <Link key={s.id} to={`/scenarios/${s.id}`}>
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="truncate">{s.name}</CardTitle>
-                    <Badge variant={statusVariant[s.status]}>{t(`scenarios.status_${s.status}`)}</Badge>
-                  </div>
-                  {s.notes && <CardDescription className="line-clamp-2">{s.notes}</CardDescription>}
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-muted-foreground">
-                    {t('scenarios.created_at')}: {new Date(s.created_at).toLocaleDateString()}
-                  </div>
-                  {s.result && (
-                    <div className="mt-2">
-                      <span className="text-muted-foreground text-sm">{t('scenarios.savings_kwh')}: </span>
-                      <span className="font-semibold">
-                        {Math.round(Number(s.result.savings_kwh)).toLocaleString()}
-                      </span>
+          {data.map((s) => {
+            const canSelect = s.status === 'ready'
+            const isSelected = selected.has(s.id)
+            return (
+              <Card
+                key={s.id}
+                className={`relative transition ${isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
+              >
+                {canSelect && (
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggle(s.id)}
+                    className="absolute top-4 right-4 w-4 h-4 z-10"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                )}
+                <Link to={`/scenarios/${s.id}`} className="block">
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="truncate pr-8">{s.name}</CardTitle>
+                      <Badge variant={statusVariant[s.status]}>
+                        {t(`scenarios.status_${s.status}`)}
+                      </Badge>
                     </div>
-                  )}
-                </CardContent>
+                    {s.notes && (
+                      <CardDescription className="line-clamp-2">{s.notes}</CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm text-muted-foreground">
+                      {t('scenarios.created_at')}: {new Date(s.created_at).toLocaleDateString()}
+                    </div>
+                    {s.result && (
+                      <div className="mt-2 flex gap-4">
+                        <div>
+                          <div className="text-xs text-muted-foreground">кВт·ч/год</div>
+                          <div className="font-semibold">
+                            {Math.round(Number(s.result.savings_kwh)).toLocaleString()}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">сум/год</div>
+                          <div className="font-semibold">
+                            {Math.round(Number(s.result.savings_money)).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Link>
               </Card>
-            </Link>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

@@ -23,7 +23,7 @@ export default function LoginPage() {
       await login(email, password)
       setStatus('success')
       setTimeout(() => nav('/'), 400)
-    } catch (err) {
+    } catch {
       setStatus('idle')
       setError(t('login.invalid'))
     }
