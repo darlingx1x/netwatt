@@ -1,5 +1,10 @@
-from fastapi import APIRouter, Query
+import json
 
+from fastapi import APIRouter, File, Query, UploadFile
+from pydantic import ValidationError
+from sqlalchemy import select
+
+from netwatt.catalog.models import Equipment
 from netwatt.catalog.schemas import (
     EquipmentCreate,
     EquipmentList,
@@ -14,7 +19,7 @@ from netwatt.catalog.service import (
     update_equipment,
 )
 from netwatt.deps import AdminUser, CurrentUser, SessionDep
-from netwatt.errors import not_found
+from netwatt.errors import bad_request, not_found
 
 router = APIRouter(prefix="/api/equipment", tags=["catalog"])
 
@@ -69,3 +74,41 @@ async def api_delete(equipment_id: int, session: SessionDep, _: AdminUser) -> No
     ok = await delete_equipment(session, equipment_id)
     if not ok:
         raise not_found("equipment_not_found")
+
+
+@router.post("/import", tags=["catalog"])
+async def api_import(
+    session: SessionDep, _: AdminUser, file: UploadFile = File(...)
+) -> dict:
+    try:
+        raw = await file.read()
+        data = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as e:
+        raise bad_request(f"invalid_json: {e}") from e
+    if not isinstance(data, list):
+        raise bad_request("expected_json_array")
+
+    created = 0
+    updated = 0
+    errors: list[dict] = []
+
+    for i, entry in enumerate(data):
+        try:
+            payload = EquipmentCreate(**entry)
+        except ValidationError as e:
+            errors.append({"index": i, "error": e.errors()})
+            continue
+        existing = await session.scalar(
+            select(Equipment).where(
+                Equipment.vendor == payload.vendor, Equipment.model == payload.model
+            )
+        )
+        if existing is None:
+            session.add(Equipment(**payload.model_dump()))
+            created += 1
+        else:
+            for k, v in payload.model_dump().items():
+                setattr(existing, k, v)
+            updated += 1
+    await session.commit()
+    return {"created": created, "updated": updated, "errors": errors, "total": len(data)}

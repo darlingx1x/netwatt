@@ -9,6 +9,9 @@
     "catalog": "Каталог",
     "admin_users": "Пользователи",
     "admin_equipment": "Оборудование",
+    "admin_audit": "Журнал аудита",
+    "admin_sessions": "Сессии",
+    "about": "О системе",
     "logout": "Выйти"
   },
   "common": {

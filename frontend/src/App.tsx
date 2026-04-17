@@ -10,7 +10,10 @@ import WizardPage from '@/pages/WizardPage'
 import ScenarioResultPage from '@/pages/ScenarioResultPage'
 import AdminUsersPage from '@/pages/AdminUsersPage'
 import AdminEquipmentPage from '@/pages/AdminEquipmentPage'
+import AdminAuditPage from '@/pages/AdminAuditPage'
+import AdminSessionsPage from '@/pages/AdminSessionsPage'
 import CompareScenariosPage from '@/pages/CompareScenariosPage'
+import AboutPage from '@/pages/AboutPage'
 
 const qc = new QueryClient({
   defaultOptions: {
@@ -53,6 +56,23 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/audit"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminAuditPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/sessions"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminSessionsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/about" element={<AboutPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

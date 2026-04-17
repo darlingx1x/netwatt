@@ -9,6 +9,9 @@
     "catalog": "Catalog",
     "admin_users": "Users",
     "admin_equipment": "Equipment",
+    "admin_audit": "Audit log",
+    "admin_sessions": "Sessions",
+    "about": "About",
     "logout": "Logout"
   },
   "common": {

@@ -12,9 +12,13 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import NullPool
 
-from netwatt.db import get_session
-from netwatt.main import app
 from netwatt.settings import settings
+
+# Disable middleware side-effects (audit writes, rate-limit) during tests
+settings.env = "test"
+
+from netwatt.db import get_session  # noqa: E402
+from netwatt.main import app  # noqa: E402
 
 
 @pytest_asyncio.fixture()

@@ -8,9 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest
 from sqlalchemy import text
 
+from netwatt.audit.router import router as audit_router
 from netwatt.auth.router import router as auth_router
+from netwatt.auth.sessions_router import router as sessions_router
 from netwatt.catalog.router import router as catalog_router
 from netwatt.db import SessionLocal
+from netwatt.middleware import AuditMiddleware, RateLimitMiddleware
 from netwatt.reports.router import router as reports_router
 from netwatt.scenarios.router import router as scenarios_router
 from netwatt.settings import settings
@@ -45,6 +48,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="NetWatt API", version="0.1.0", lifespan=lifespan)
 
+app.add_middleware(AuditMiddleware)
+app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -54,10 +59,12 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(sessions_router)
 app.include_router(catalog_router)
 app.include_router(scenarios_router)
 app.include_router(reports_router)
 app.include_router(users_router)
+app.include_router(audit_router)
 
 
 @app.get("/healthz")

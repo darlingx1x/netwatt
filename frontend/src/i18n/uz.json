@@ -9,6 +9,9 @@
     "catalog": "Katalog",
     "admin_users": "Foydalanuvchilar",
     "admin_equipment": "Qurilmalar",
+    "admin_audit": "Audit jurnali",
+    "admin_sessions": "Sessiyalar",
+    "about": "Tizim haqida",
     "logout": "Chiqish"
   },
   "common": {

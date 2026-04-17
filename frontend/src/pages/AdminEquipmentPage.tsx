@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/api/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import DeleteButton from '@/components/ui/delete-button'
-import { Plus } from 'lucide-react'
+import { Plus, Upload } from 'lucide-react'
 
 interface Equipment {
   id: number
@@ -87,20 +87,80 @@ export default function AdminEquipmentPage() {
     },
   })
 
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [importReport, setImportReport] = useState<null | {
+    created: number
+    updated: number
+    errors: unknown[]
+    total: number
+  }>(null)
+
+  const importJson = useMutation({
+    mutationFn: async (file: File) => {
+      const fd = new FormData()
+      fd.append('file', file)
+      const { data } = await api.post('/equipment/import', fd)
+      return data as { created: number; updated: number; errors: unknown[]; total: number }
+    },
+    onSuccess: (data) => {
+      setImportReport(data)
+      qc.invalidateQueries({ queryKey: ['equipment-admin'] })
+      qc.invalidateQueries({ queryKey: ['equipment'] })
+    },
+  })
+
   return (
     <div className="space-y-6 max-w-6xl">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">Оборудование</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Input
             placeholder="Поиск по вендору/модели…"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="w-60"
           />
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (f) importJson.mutate(f)
+              e.target.value = ''
+            }}
+          />
+          <Button
+            variant="outline"
+            onClick={() => fileRef.current?.click()}
+            disabled={importJson.isPending}
+          >
+            <Upload className="w-4 h-4 mr-1" />
+            Импорт JSON
+          </Button>
           {data && <span className="text-sm text-muted-foreground">{data.total} моделей</span>}
         </div>
       </div>
+
+      {importReport && (
+        <Card className="border-primary/40 bg-primary/5">
+          <CardContent className="py-3 flex flex-wrap gap-4 text-sm">
+            <span>Импорт: <strong>{importReport.total}</strong> записей</span>
+            <span>создано <strong>{importReport.created}</strong></span>
+            <span>обновлено <strong>{importReport.updated}</strong></span>
+            <span className={importReport.errors.length ? 'text-destructive' : ''}>
+              ошибок <strong>{importReport.errors.length}</strong>
+            </span>
+            <button
+              className="ml-auto text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => setImportReport(null)}
+            >
+              закрыть
+            </button>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
