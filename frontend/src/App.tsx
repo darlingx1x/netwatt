@@ -6,7 +6,10 @@ import LoginPage from '@/pages/LoginPage'
 import DashboardPage from '@/pages/DashboardPage'
 import ScenariosPage from '@/pages/ScenariosPage'
 import CatalogPage from '@/pages/CatalogPage'
-import { WizardStub, ScenarioResultStub, AdminUsersStub, AdminEquipmentStub } from '@/pages/stubs'
+import WizardPage from '@/pages/WizardPage'
+import ScenarioResultPage from '@/pages/ScenarioResultPage'
+import AdminUsersPage from '@/pages/AdminUsersPage'
+import AdminEquipmentPage from '@/pages/AdminEquipmentPage'
 
 const qc = new QueryClient({
   defaultOptions: {
@@ -29,14 +32,14 @@ export default function App() {
           >
             <Route path="/" element={<DashboardPage />} />
             <Route path="/scenarios" element={<ScenariosPage />} />
-            <Route path="/scenarios/new" element={<WizardStub />} />
-            <Route path="/scenarios/:id" element={<ScenarioResultStub />} />
+            <Route path="/scenarios/new" element={<WizardPage />} />
+            <Route path="/scenarios/:id" element={<ScenarioResultPage />} />
             <Route path="/catalog" element={<CatalogPage />} />
             <Route
               path="/admin/users"
               element={
                 <ProtectedRoute adminOnly>
-                  <AdminUsersStub />
+                  <AdminUsersPage />
                 </ProtectedRoute>
               }
             />
@@ -44,7 +47,7 @@ export default function App() {
               path="/admin/equipment"
               element={
                 <ProtectedRoute adminOnly>
-                  <AdminEquipmentStub />
+                  <AdminEquipmentPage />
                 </ProtectedRoute>
               }
             />

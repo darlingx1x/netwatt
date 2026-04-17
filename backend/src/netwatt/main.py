@@ -11,6 +11,7 @@ from netwatt.db import SessionLocal
 from netwatt.reports.router import router as reports_router
 from netwatt.scenarios.router import router as scenarios_router
 from netwatt.settings import settings
+from netwatt.users.router import router as users_router
 
 
 @asynccontextmanager
@@ -32,6 +33,7 @@ app.include_router(auth_router)
 app.include_router(catalog_router)
 app.include_router(scenarios_router)
 app.include_router(reports_router)
+app.include_router(users_router)
 
 
 @app.get("/healthz")
