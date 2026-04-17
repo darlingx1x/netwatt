@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from netwatt.auth.router import router as auth_router
+from netwatt.catalog.router import router as catalog_router
 from netwatt.db import SessionLocal
 from netwatt.settings import settings
 
@@ -26,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(catalog_router)
 
 
 @app.get("/healthz")

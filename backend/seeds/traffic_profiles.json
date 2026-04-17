@@ -1,0 +1,14 @@
+[
+  {"key": "office_8x5", "label_ru": "Офис 8×5", "label_uz": "Ofis 8×5", "label_en": "Office 8×5",
+   "day_util": 0.35, "peak_util": 0.70, "night_util": 0.05,
+   "day_hours": 6, "peak_hours": 2, "night_hours": 16},
+  {"key": "datacenter_24x7", "label_ru": "Датацентр 24×7", "label_uz": "Data-markaz 24×7", "label_en": "Datacenter 24×7",
+   "day_util": 0.50, "peak_util": 0.85, "night_util": 0.40,
+   "day_hours": 10, "peak_hours": 4, "night_hours": 10},
+  {"key": "campus", "label_ru": "Кампус", "label_uz": "Kampus", "label_en": "Campus",
+   "day_util": 0.40, "peak_util": 0.75, "night_util": 0.10,
+   "day_hours": 8, "peak_hours": 3, "night_hours": 13},
+  {"key": "industrial", "label_ru": "Производство", "label_uz": "Ishlab chiqarish", "label_en": "Industrial",
+   "day_util": 0.60, "peak_util": 0.85, "night_util": 0.30,
+   "day_hours": 16, "peak_hours": 4, "night_hours": 4}
+]
