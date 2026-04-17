@@ -22,3 +22,14 @@ async def get_session() -> AsyncIterator[AsyncSession]:
         except Exception:
             await session.rollback()
             raise
+
+
+def _register_models() -> None:
+    """Import all model modules so SQLAlchemy resolves string-referenced relationships."""
+    from netwatt.auth import models as _auth  # noqa: F401
+    from netwatt.catalog import models as _catalog  # noqa: F401
+    from netwatt.scenarios import models as _scenarios  # noqa: F401
+    from netwatt.users import models as _users  # noqa: F401
+
+
+_register_models()
