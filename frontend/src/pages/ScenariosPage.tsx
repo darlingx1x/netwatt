@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
-import { Plus, FolderKanban, GitCompare } from 'lucide-react'
+import { Plus, FolderKanban, GitCompare, Check } from 'lucide-react'
 
 interface Scenario {
   id: number
@@ -94,22 +94,34 @@ export default function ScenariosPage() {
                 key={s.id}
                 className={`relative transition ${isSelected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
               >
-                {canSelect && (
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => toggle(s.id)}
-                    className="absolute top-4 right-4 w-4 h-4 z-10"
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                )}
                 <Link to={`/scenarios/${s.id}`} className="block">
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="truncate pr-8">{s.name}</CardTitle>
-                      <Badge variant={statusVariant[s.status]}>
-                        {t(`scenarios.status_${s.status}`)}
-                      </Badge>
+                      <CardTitle className="truncate">{s.name}</CardTitle>
+                      {canSelect ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            toggle(s.id)
+                          }}
+                          className={`shrink-0 inline-flex items-center gap-1 h-6 px-2 rounded-md text-xs font-medium border transition ${
+                            isSelected
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background text-foreground border-border hover:border-primary'
+                          }`}
+                          aria-pressed={isSelected}
+                          title={isSelected ? 'Убрать из сравнения' : 'Выбрать для сравнения'}
+                        >
+                          {isSelected ? <Check className="w-3 h-3" /> : null}
+                          {t(`scenarios.status_${s.status}`)}
+                        </button>
+                      ) : (
+                        <Badge variant={statusVariant[s.status]} className="shrink-0">
+                          {t(`scenarios.status_${s.status}`)}
+                        </Badge>
+                      )}
                     </div>
                     {s.notes && (
                       <CardDescription className="line-clamp-2">{s.notes}</CardDescription>
