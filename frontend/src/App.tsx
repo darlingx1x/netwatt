@@ -13,6 +13,7 @@ import AdminEquipmentPage from '@/pages/AdminEquipmentPage'
 import AdminAuditPage from '@/pages/AdminAuditPage'
 import AdminSessionsPage from '@/pages/AdminSessionsPage'
 import CompareScenariosPage from '@/pages/CompareScenariosPage'
+import { CommandPalette } from '@/components/CommandPalette'
 import AboutPage from '@/pages/AboutPage'
 import MethodologyPage from '@/pages/MethodologyPage'
 
@@ -26,6 +27,7 @@ export default function App() {
   return (
     <QueryClientProvider client={qc}>
       <BrowserRouter>
+        <CommandPalette />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route

@@ -28,6 +28,9 @@ import {
   RoiProjectionChart,
   SensitivityPanel,
 } from '@/components/ResultEnhancements'
+import { NetworkTopology } from '@/components/NetworkTopology'
+import { ConsumptionHeatmap } from '@/components/Heatmap'
+import { BeforeAfterToggle } from '@/components/BeforeAfterToggle'
 
 interface Result {
   e_base_kwh: string
@@ -229,6 +232,20 @@ export default function ScenarioResultPage() {
           </CardContent>
         </Card>
       </div>
+
+      <BeforeAfterToggle
+        baseKwh={Number(r.e_base_kwh)}
+        optKwh={Number(r.e_optimized_kwh)}
+        baseMoney={Number(r.e_base_kwh) * Math.max(1, savingsMoney / Math.max(1, savingsKwh))}
+        optMoney={Number(r.e_optimized_kwh) * Math.max(1, savingsMoney / Math.max(1, savingsKwh))}
+      />
+
+      <NetworkTopology perDevice={r.per_device} />
+
+      <ConsumptionHeatmap
+        traffic={data.traffic}
+        avgKwhPerHour={Number(r.e_base_kwh) / (365 * 24)}
+      />
 
       <RoiProjectionChart
         savingsYear={savingsMoney}

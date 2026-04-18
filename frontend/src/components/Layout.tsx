@@ -1,11 +1,14 @@
 import { ReactNode } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '@/api/client'
 import { useAuth } from '@/store/auth'
 import { useUi, Lang, Theme } from '@/store/ui'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, FolderKanban, BookOpen, Users, Server, LogOut, Moon, Sun, Info, ScrollText, KeyRound, FunctionSquare } from 'lucide-react'
+import { LiveTicker } from '@/components/LiveTicker'
+import { LayoutDashboard, FolderKanban, BookOpen, Users, Server, LogOut, Moon, Sun, Info, ScrollText, KeyRound, FunctionSquare, Command } from 'lucide-react'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
@@ -28,6 +31,15 @@ export default function Layout(): ReactNode {
   const { user, logout } = useAuth()
   const { lang, setLang, theme, setTheme } = useUi()
   const isAdmin = user?.role === 'admin'
+
+  const { data: scenarios } = useQuery({
+    queryKey: ['scenarios'],
+    queryFn: async () =>
+      (await api.get<Array<{ status: string; result: { savings_money: string } | null }>>('/scenarios')).data,
+  })
+  const annualSavings = (scenarios ?? [])
+    .filter((s) => s.status === 'ready' && s.result)
+    .reduce((a, s) => a + Number(s.result!.savings_money), 0)
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -101,9 +113,22 @@ export default function Layout(): ReactNode {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-card/50">
+        <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-card/50 gap-2">
           <div className="md:hidden font-semibold">{t('app.title')}</div>
+          <button
+            type="button"
+            onClick={() => {
+              const evt = new KeyboardEvent('keydown', { key: 'k', metaKey: true })
+              window.dispatchEvent(evt)
+            }}
+            className="hidden md:flex items-center gap-2 h-8 px-3 rounded-md border border-border bg-card text-xs text-muted-foreground hover:text-foreground hover:border-foreground/20 transition min-w-[200px]"
+          >
+            <Command className="w-3.5 h-3.5" />
+            <span>Команды, сценарии…</span>
+            <kbd className="ml-auto text-[10px] px-1 py-0.5 rounded bg-muted font-mono">⌘K</kbd>
+          </button>
           <div className="ml-auto flex items-center gap-2">
+            <LiveTicker annualUzs={annualSavings} />
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value as Lang)}
