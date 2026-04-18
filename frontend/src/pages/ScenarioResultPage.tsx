@@ -21,6 +21,13 @@ import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { AnimatedCounter } from '@/components/ui/animated-counter'
 import { Zap, DollarSign, Leaf, FileSpreadsheet, FileText } from 'lucide-react'
+import {
+  DeviceCategoryPie,
+  DeviceHealthBars,
+  PolicyDistributionPie,
+  RoiProjectionChart,
+  SensitivityPanel,
+} from '@/components/ResultEnhancements'
 
 interface Result {
   e_base_kwh: string
@@ -222,6 +229,21 @@ export default function ScenarioResultPage() {
           </CardContent>
         </Card>
       </div>
+
+      <RoiProjectionChart
+        savingsYear={savingsMoney}
+        investment={Number((r as unknown as { investment?: number }).investment ?? 0)}
+        years={5}
+      />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <PolicyDistributionPie breakdown={r.breakdown} />
+        <DeviceCategoryPie perDevice={r.per_device} />
+      </div>
+
+      <SensitivityPanel baseSavingsKwh={savingsKwh} baseTariffUzs={savingsMoney} />
+
+      <DeviceHealthBars perDevice={r.per_device} />
 
       <Card>
         <CardHeader>

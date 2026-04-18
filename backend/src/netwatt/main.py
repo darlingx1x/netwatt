@@ -42,6 +42,24 @@ REQUESTS_TOTAL = Counter(
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     structlog.get_logger().info("netwatt.startup", env=settings.env)
+    if settings.env != "test":
+        try:
+            async with SessionLocal() as session:
+                from sqlalchemy import select
+
+                from netwatt.users.models import User
+
+                has_admin = await session.scalar(
+                    select(User).where(User.email == "admin@tuit.uz")
+                )
+                if has_admin is None:
+                    from netwatt.cli import _seed_demo
+
+                    structlog.get_logger().info("netwatt.autoseed.start")
+                    await _seed_demo(reset=False)
+                    structlog.get_logger().info("netwatt.autoseed.done")
+        except Exception as e:
+            structlog.get_logger().warning("netwatt.autoseed.failed", error=str(e))
     yield
     structlog.get_logger().info("netwatt.shutdown")
 

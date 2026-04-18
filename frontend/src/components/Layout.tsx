@@ -5,12 +5,13 @@ import { useAuth } from '@/store/auth'
 import { useUi, Lang, Theme } from '@/store/ui'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, FolderKanban, BookOpen, Users, Server, LogOut, Moon, Sun, Info, ScrollText, KeyRound } from 'lucide-react'
+import { LayoutDashboard, FolderKanban, BookOpen, Users, Server, LogOut, Moon, Sun, Info, ScrollText, KeyRound, FunctionSquare } from 'lucide-react'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
   { to: '/scenarios', icon: FolderKanban, labelKey: 'nav.scenarios' },
   { to: '/catalog', icon: BookOpen, labelKey: 'nav.catalog' },
+  { to: '/methodology', icon: FunctionSquare, labelKey: 'nav.methodology' },
   { to: '/about', icon: Info, labelKey: 'nav.about' },
 ] as const
 

@@ -8,7 +8,18 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { AnimatedCounter } from '@/components/ui/animated-counter'
-import { Plus, FolderKanban, BookOpen, Zap, Leaf, DollarSign, Activity } from 'lucide-react'
+import {
+  Plus,
+  FolderKanban,
+  BookOpen,
+  Zap,
+  Leaf,
+  DollarSign,
+  Activity,
+  GitCompare,
+  TrendingUp,
+  Info,
+} from 'lucide-react'
 
 interface Scenario {
   id: number
@@ -35,16 +46,53 @@ export default function DashboardPage() {
   const totalKwh = Math.round(ready.reduce((a, s) => a + Number(s.result?.savings_kwh ?? 0), 0))
   const totalMoney = Math.round(ready.reduce((a, s) => a + Number(s.result?.savings_money ?? 0), 0))
   const totalCo2 = Math.round(ready.reduce((a, s) => a + Number(s.result?.co2_saved_kg ?? 0), 0))
+  const cumFiveYears = totalMoney * 5
 
   const recent = (scenarios ?? []).slice(0, 5)
 
   return (
     <div className="space-y-6 max-w-6xl">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">
+      {/* Hero */}
+      <div className="rounded-2xl bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-600 text-white p-6 md:p-8 shadow-xl">
+        <div className="text-sm opacity-80">
           {t('dashboard.heading')}, {user?.full_name?.split(' ')[0]}
-        </h1>
-        <p className="text-muted-foreground">{t('dashboard.hint')}</p>
+        </div>
+        <div className="mt-2 flex items-baseline gap-3 flex-wrap">
+          <div className="text-5xl md:text-6xl font-bold tracking-tight tabular-nums">
+            <AnimatedCounter value={cumFiveYears} fontSize={56} />
+          </div>
+          <div className="text-lg opacity-90">сум</div>
+        </div>
+        <div className="mt-1 text-sm opacity-85">
+          совокупная экономия за 5 лет по {ready.length} готовым сценариям · EF_grid 0.468 кг CO₂/кВт·ч (МЭ РУз 2024)
+        </div>
+        <div className="mt-4 flex gap-2 flex-wrap">
+          <Link to="/scenarios/new">
+            <Button variant="secondary" className="bg-white text-blue-900 hover:bg-white/90">
+              <Plus className="w-4 h-4 mr-1" />
+              {t('dashboard.create_scenario')}
+            </Button>
+          </Link>
+          {ready.length >= 2 && (
+            <Link
+              to={`/scenarios/compare?ids=${ready
+                .slice(0, 3)
+                .map((s) => s.id)
+                .join(',')}`}
+            >
+              <Button variant="secondary" className="bg-white/15 hover:bg-white/25 text-white border-white/30">
+                <GitCompare className="w-4 h-4 mr-1" />
+                Сравнить топ-3
+              </Button>
+            </Link>
+          )}
+          <Link to="/methodology">
+            <Button variant="secondary" className="bg-white/15 hover:bg-white/25 text-white border-white/30">
+              <Info className="w-4 h-4 mr-1" />
+              Методология
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {isLoading && <Spinner />}
@@ -56,25 +104,25 @@ export default function DashboardPage() {
               icon={<Activity className="w-5 h-5 text-blue-600" />}
               label="Сценариев"
               value={scenarios?.length ?? 0}
-              subline={`${ready.length} готовы`}
+              subline={`${ready.length} рассчитано`}
             />
             <StatCard
               icon={<Zap className="w-5 h-5 text-amber-500" />}
-              label="Экономия энергии"
+              label="Экономия энергии / год"
               value={totalKwh}
-              unit="кВт·ч/год"
+              unit="кВт·ч"
             />
             <StatCard
               icon={<DollarSign className="w-5 h-5 text-emerald-600" />}
-              label="Экономия средств"
+              label="Экономия средств / год"
               value={totalMoney}
-              unit="сум/год"
+              unit="сум"
             />
             <StatCard
               icon={<Leaf className="w-5 h-5 text-green-600" />}
-              label="Снижение CO₂"
+              label="Снижение CO₂ / год"
               value={totalCo2}
-              unit="кг/год"
+              unit="кг"
             />
           </div>
 
@@ -85,7 +133,7 @@ export default function DashboardPage() {
                   <FolderKanban className="w-4 h-4" />
                   {t('nav.scenarios')}
                 </CardTitle>
-                <CardDescription>{t('dashboard.hint')}</CardDescription>
+                <CardDescription>Создавайте и считайте проекты оптимизации</CardDescription>
               </CardHeader>
               <CardContent className="flex gap-2">
                 <Link to="/scenarios/new">
@@ -105,35 +153,34 @@ export default function DashboardPage() {
                   <BookOpen className="w-4 h-4" />
                   {t('nav.catalog')}
                 </CardTitle>
-                <CardDescription>50 моделей оборудования</CardDescription>
+                <CardDescription>50 моделей Cisco, HPE, Juniper, MikroTik, Dell, Ubiquiti…</CardDescription>
               </CardHeader>
               <CardContent>
                 <Link to="/catalog">
-                  <Button variant="outline">{t('nav.catalog')}</Button>
+                  <Button variant="outline">Открыть</Button>
                 </Link>
               </CardContent>
             </Card>
-            {ready.length >= 2 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Activity className="w-4 h-4" />
-                    Сравнить
-                  </CardTitle>
-                  <CardDescription>Два лучших по экономии</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link
-                    to={`/scenarios/compare?ids=${ready
-                      .slice(0, 2)
-                      .map((s) => s.id)
-                      .join(',')}`}
-                  >
-                    <Button variant="outline">Сравнить</Button>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <TrendingUp className="w-4 h-4" />
+                  Демо-золотой
+                </CardTitle>
+                <CardDescription>Эталон из ВКР: 120 портов, офис 8×5</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {ready.length > 0 ? (
+                  <Link to={`/scenarios/${ready[0].id}`}>
+                    <Button variant="outline">Открыть</Button>
                   </Link>
-                </CardContent>
-              </Card>
-            )}
+                ) : (
+                  <Link to="/scenarios/new">
+                    <Button variant="outline">Создать</Button>
+                  </Link>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {recent.length > 0 && (

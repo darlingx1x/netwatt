@@ -14,6 +14,7 @@ import AdminAuditPage from '@/pages/AdminAuditPage'
 import AdminSessionsPage from '@/pages/AdminSessionsPage'
 import CompareScenariosPage from '@/pages/CompareScenariosPage'
 import AboutPage from '@/pages/AboutPage'
+import MethodologyPage from '@/pages/MethodologyPage'
 
 const qc = new QueryClient({
   defaultOptions: {
@@ -73,6 +74,7 @@ export default function App() {
               }
             />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/methodology" element={<MethodologyPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
