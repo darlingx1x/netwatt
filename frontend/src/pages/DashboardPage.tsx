@@ -52,46 +52,62 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 max-w-6xl">
-      {/* Hero */}
-      <div className="rounded-2xl bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-600 text-white p-6 md:p-8 shadow-xl">
-        <div className="text-sm opacity-80">
-          {t('dashboard.heading')}, {user?.full_name?.split(' ')[0]}
-        </div>
-        <div className="mt-2 flex items-baseline gap-3 flex-wrap">
-          <div className="text-5xl md:text-6xl font-bold tracking-tight tabular-nums">
-            <AnimatedCounter value={cumFiveYears} fontSize={56} />
+      {/* Hero — плоская карточка с акцентной полосой слева */}
+      <div className="relative rounded-xl border border-border bg-card overflow-hidden">
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-foreground" aria-hidden />
+        <div className="p-6 md:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-end">
+          <div>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+              <span>{t('dashboard.heading')}, {user?.full_name?.split(' ')[0]}</span>
+              <span>·</span>
+              <span>5-летний горизонт</span>
+            </div>
+            <div className="mt-3 flex items-baseline gap-3 flex-wrap">
+              <div className="tabular-nums leading-none">
+                <AnimatedCounter value={cumFiveYears} fontSize={64} />
+              </div>
+              <div className="text-lg text-muted-foreground">сум</div>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <Badge variant="outline">{ready.length} рассчитано</Badge>
+              <span>·</span>
+              <span>EF_grid 0.468 кг CO₂/кВт·ч</span>
+              <span className="text-xs">(МЭ РУз 2024)</span>
+            </div>
+            <div className="mt-5 flex gap-2 flex-wrap">
+              <Link to="/scenarios/new">
+                <Button>
+                  <Plus className="w-4 h-4 mr-1" />
+                  {t('dashboard.create_scenario')}
+                </Button>
+              </Link>
+              {ready.length >= 2 && (
+                <Link
+                  to={`/scenarios/compare?ids=${ready
+                    .slice(0, 3)
+                    .map((s) => s.id)
+                    .join(',')}`}
+                >
+                  <Button variant="outline">
+                    <GitCompare className="w-4 h-4 mr-1" />
+                    Сравнить топ-3
+                  </Button>
+                </Link>
+              )}
+              <Link to="/methodology">
+                <Button variant="outline">
+                  <Info className="w-4 h-4 mr-1" />
+                  Методология
+                </Button>
+              </Link>
+            </div>
           </div>
-          <div className="text-lg opacity-90">сум</div>
-        </div>
-        <div className="mt-1 text-sm opacity-85">
-          совокупная экономия за 5 лет по {ready.length} готовым сценариям · EF_grid 0.468 кг CO₂/кВт·ч (МЭ РУз 2024)
-        </div>
-        <div className="mt-4 flex gap-2 flex-wrap">
-          <Link to="/scenarios/new">
-            <Button variant="secondary" className="bg-white text-blue-900 hover:bg-white/90">
-              <Plus className="w-4 h-4 mr-1" />
-              {t('dashboard.create_scenario')}
-            </Button>
-          </Link>
-          {ready.length >= 2 && (
-            <Link
-              to={`/scenarios/compare?ids=${ready
-                .slice(0, 3)
-                .map((s) => s.id)
-                .join(',')}`}
-            >
-              <Button variant="secondary" className="bg-white/15 hover:bg-white/25 text-white border-white/30">
-                <GitCompare className="w-4 h-4 mr-1" />
-                Сравнить топ-3
-              </Button>
-            </Link>
-          )}
-          <Link to="/methodology">
-            <Button variant="secondary" className="bg-white/15 hover:bg-white/25 text-white border-white/30">
-              <Info className="w-4 h-4 mr-1" />
-              Методология
-            </Button>
-          </Link>
+
+          <div className="grid grid-cols-3 md:grid-cols-1 gap-3 md:min-w-[180px] md:pl-6 md:border-l md:border-border">
+            <HeroMetric label="В год" value={totalMoney} unit="сум" />
+            <HeroMetric label="Энергия" value={totalKwh} unit="кВт·ч" />
+            <HeroMetric label="CO₂" value={totalCo2} unit="кг" />
+          </div>
         </div>
       </div>
 
@@ -249,5 +265,17 @@ function StatCard({
         {subline && <div className="text-xs text-muted-foreground mt-1">{subline}</div>}
       </CardContent>
     </Card>
+  )
+}
+
+function HeroMetric({ label, value, unit }: { label: string; value: number; unit: string }) {
+  return (
+    <div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="font-mono font-semibold tabular-nums text-base">
+        {value.toLocaleString()}
+      </div>
+      <div className="text-[10px] text-muted-foreground">{unit}</div>
+    </div>
   )
 }
