@@ -3,6 +3,7 @@
 import { Undo2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface DeleteButtonProps {
   /** Unique id to avoid layoutId conflicts when multiple instances exist */
@@ -21,12 +22,15 @@ interface DeleteButtonProps {
 
 const DeleteButton: React.FC<DeleteButtonProps> = ({
   id = "default",
-  deleteText = "Удалить",
-  cancelText = "Отменить",
+  deleteText,
+  cancelText,
   countdown: countdownDuration = 3,
   onDelete,
   className,
 }) => {
+  const { t } = useTranslation();
+  const resolvedDelete = deleteText ?? t("delete_btn.delete");
+  const resolvedCancel = cancelText ?? t("delete_btn.cancel");
   const layoutId = `deleteButton-${id}`;
   const textLayoutId = `buttonText-${id}`;
   const [isDeleting, setIsDeleting] = useState(false);
@@ -103,7 +107,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.1 }}
             >
-              {deleteText.split("").map((char, i) => (
+              {resolvedDelete.split("").map((char, i) => (
                 <motion.span
                   key={`delete-${i}`}
                   initial={{ y: 20, opacity: 0, scale: 0.3 }}
@@ -169,7 +173,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.1 }}
             >
-              {cancelText.split("").map((char, i) => (
+              {resolvedCancel.split("").map((char, i) => (
                 <motion.span
                   key={`cancel-${i}`}
                   initial={{ y: 20, opacity: 0, scale: 0.3 }}

@@ -1,4 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQueries } from '@tanstack/react-query'
 import {
   BarChart,
@@ -33,6 +34,7 @@ interface Scenario {
 }
 
 export default function CompareScenariosPage() {
+  const { t } = useTranslation()
   const [params] = useSearchParams()
   const ids = (params.get('ids') ?? '').split(',').map(Number).filter(Boolean)
 
@@ -49,7 +51,8 @@ export default function CompareScenariosPage() {
   if (scenarios.length < 2) {
     return (
       <div className="text-muted-foreground">
-        Нужно минимум 2 сценария. Формат URL: <code>/scenarios/compare?ids=1,2</code>
+        {t('scenarios.compare_min_two')} {t('scenarios.compare_url_format', { format: '' })}
+        <code>/scenarios/compare?ids=1,2</code>
       </div>
     )
   }
@@ -74,7 +77,7 @@ export default function CompareScenariosPage() {
 
   return (
     <div className="space-y-6 max-w-6xl">
-      <h1 className="text-3xl font-semibold tracking-tight">Сравнение сценариев</h1>
+      <h1 className="text-3xl font-semibold tracking-tight">{t('scenarios.compare_heading')}</h1>
 
       <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${scenarios.length}, 1fr)` }}>
         {scenarios.map((s) => (
@@ -90,33 +93,33 @@ export default function CompareScenariosPage() {
             <CardContent className="text-sm space-y-2">
               {s.result ? (
                 <>
-                  <Row label="E_base" value={Math.round(Number(s.result.e_base_kwh)).toLocaleString()} unit="кВт·ч" />
+                  <Row label="E_base" value={Math.round(Number(s.result.e_base_kwh)).toLocaleString()} unit={t('common.kwh')} />
                   <Row
                     label="E_opt"
                     value={Math.round(Number(s.result.e_optimized_kwh)).toLocaleString()}
-                    unit="кВт·ч"
+                    unit={t('common.kwh')}
                   />
                   <Row
-                    label="Экономия"
+                    label={t('scenarios.savings_label')}
                     value={Math.round(Number(s.result.savings_kwh)).toLocaleString()}
-                    unit="кВт·ч"
+                    unit={t('common.kwh')}
                     emph
                   />
                   <Row
-                    label="В деньгах"
+                    label={t('scenarios.in_money')}
                     value={Math.round(Number(s.result.savings_money)).toLocaleString()}
-                    unit="сум"
+                    unit={t('common.uzs')}
                     emph
                   />
                   <Row
                     label="CO₂"
                     value={Math.round(Number(s.result.co2_saved_kg)).toLocaleString()}
-                    unit="кг"
+                    unit={t('common.kg')}
                     emph
                   />
                 </>
               ) : (
-                <div className="text-muted-foreground">Результат ещё не рассчитан</div>
+                <div className="text-muted-foreground">{t('scenarios.result_not_calculated')}</div>
               )}
             </CardContent>
           </Card>
@@ -133,16 +136,16 @@ export default function CompareScenariosPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <DeltaCard label="Экономия кВт·ч" pct={delta('savings_kwh')} />
-            <DeltaCard label="Экономия денег" pct={delta('savings_money')} />
-            <DeltaCard label="CO₂" pct={delta('co2_saved_kg')} />
+            <DeltaCard label={t('scenarios.delta_savings_kwh')} pct={delta('savings_kwh')} />
+            <DeltaCard label={t('scenarios.delta_savings_money')} pct={delta('savings_money')} />
+            <DeltaCard label={t('scenarios.delta_co2')} pct={delta('co2_saved_kg')} />
           </CardContent>
         </Card>
       )}
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Экономия по политикам</CardTitle>
+          <CardTitle className="text-base">{t('scenarios.by_policies')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={280}>

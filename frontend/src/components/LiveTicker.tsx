@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TrendingUp } from 'lucide-react'
 
 export function LiveTicker({ annualUzs }: { annualUzs: number }) {
+  const { t } = useTranslation()
   const [val, setVal] = useState(0)
 
   useEffect(() => {
@@ -26,12 +28,12 @@ export function LiveTicker({ annualUzs }: { annualUzs: number }) {
   return (
     <div
       className="hidden md:flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-border bg-card text-xs font-mono tabular-nums"
-      title="Накоплено с момента открытия страницы (на основе годовой экономии)"
+      title={t('ticker.title')}
     >
       <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
       <span className="text-muted-foreground">+</span>
       <span className="text-foreground">{val.toFixed(2)}</span>
-      <span className="text-muted-foreground">сум</span>
+      <span className="text-muted-foreground">{t('common.uzs')}</span>
     </div>
   )
 }

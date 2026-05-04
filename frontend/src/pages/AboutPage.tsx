@@ -1,53 +1,55 @@
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Zap, Leaf, ShieldCheck, Scale, BookOpen } from 'lucide-react'
 
 export default function AboutPage() {
+  const { t } = useTranslation()
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">О системе NetWatt</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('about.heading')}</h1>
         <p className="text-muted-foreground mt-1">
-          ВКР «Разработка программного обеспечения для оптимизации энергопотребления сетевой инфраструктуры»
+          {t('about.subtitle')}
         </p>
-        <p className="text-sm text-muted-foreground">Шарипов Жавохир · ТУИТ · 2026</p>
+        <p className="text-sm text-muted-foreground">{t('about.author')}</p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Scale className="w-5 h-5" />
-            Правовая база Республики Узбекистан
+            {t('about.card_law')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <Law
             code="ЗРУ-628"
-            title="Об использовании возобновляемых источников энергии"
+            title={t('about.law_628_title')}
             year="2019"
-            text="Определяет правовые основы использования ВИЭ, стимулирует энергоэффективность в сетевой инфраструктуре."
+            text={t('about.law_628_text')}
           />
           <Separator />
           <Law
             code="УП-158"
-            title="Об ускоренном развитии экспортоориентированной электроэнергетики"
+            title={t('about.law_158_title')}
             year="2019-08-27"
-            text="Указ Президента об ускоренном развитии экспортоориентированной электроэнергетики и улучшении энергоэффективности."
+            text={t('about.law_158_text')}
           />
           <Separator />
           <Law
             code="ПП-4422"
-            title="О мерах по повышению энергоэффективности"
+            title={t('about.law_4422_title')}
             year="2019"
-            text="Постановление правительства о внедрении стандартов энергоэффективности в технической инфраструктуре."
+            text={t('about.law_4422_text')}
           />
           <Separator />
           <Law
             code="ЗРУ-547"
-            title="О персональных данных"
+            title={t('about.law_547_title')}
             year="2019-07-02"
-            text="Хранение персональных данных в системе ограничено email и ФИО; все действия пишутся в audit_log."
+            text={t('about.law_547_text')}
           />
         </CardContent>
       </Card>
@@ -56,22 +58,19 @@ export default function AboutPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Leaf className="w-5 h-5 text-green-600" />
-            Экологический эффект
+            {t('about.card_eco')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm space-y-2">
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="font-mono">
-              EF_grid = 0.468 кг CO₂ / кВт·ч
+              {t('about.ef_grid_badge')}
             </Badge>
             <span className="text-muted-foreground">
-              (Министерство энергетики РУз, 2024)
+              {t('about.ef_grid_source')}
             </span>
           </div>
-          <p>
-            Коэффициент эмиссии сети Узбекистана используется во всех расчётах снижения CO₂. Сохранённая энергия
-            умножается на EF_grid — это даёт эквивалент выбросов, которых удалось избежать.
-          </p>
+          <p>{t('about.eco_text')}</p>
         </CardContent>
       </Card>
 
@@ -79,14 +78,14 @@ export default function AboutPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Zap className="w-5 h-5 text-amber-500" />
-            Политики оптимизации
+            {t('about.card_policies')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm space-y-3">
-          <Policy name="IEEE 802.3az (EEE)" desc="Energy-Efficient Ethernet — снижение энергии портов во время простоя. η_EEE ∈ [0.2, 0.7]." />
-          <Policy name="Adaptive Link Rate (ALR)" desc="Снижение скорости линка при низкой нагрузке. Типичное падение мощности 30–40%." />
-          <Policy name="PoE Scheduling" desc="Отключение PoE по расписанию в ночные часы (до 14 часов/сутки)." />
-          <Policy name="Server Consolidation" desc="Миграция ВМ на минимальное число серверов, выключение избыточных в ночные часы." />
+          <Policy name="IEEE 802.3az (EEE)" desc={t('about.policy_eee_desc')} />
+          <Policy name="Adaptive Link Rate (ALR)" desc={t('about.policy_alr_desc')} />
+          <Policy name="PoE Scheduling" desc={t('about.policy_poe_desc')} />
+          <Policy name="Server Consolidation" desc={t('about.policy_consol_desc')} />
         </CardContent>
       </Card>
 
@@ -94,30 +93,27 @@ export default function AboutPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <ShieldCheck className="w-5 h-5" />
-            Архитектура и безопасность
+            {t('about.card_security')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm space-y-2">
           <div>
-            <Badge variant="outline">Auth</Badge> Access + Refresh токены в PostgreSQL (без JWT). Ротация refresh с
-            детектом reuse — компрометация одного токена автоматически revoke'ает всю сессию.
+            <Badge variant="outline">Auth</Badge> {t('about.sec_auth_text')}
           </div>
           <div>
-            <Badge variant="outline">Hash</Badge> argon2id (time_cost=2, memory_cost=64MB) для паролей.
+            <Badge variant="outline">Hash</Badge> {t('about.sec_hash_text')}
           </div>
           <div>
-            <Badge variant="outline">Rate-limit</Badge> /api/auth/login — 10 попыток/мин/IP.
+            <Badge variant="outline">Rate-limit</Badge> {t('about.sec_rl_text')}
           </div>
           <div>
-            <Badge variant="outline">Audit</Badge> Все POST/PATCH/DELETE пишутся в audit_log (просмотр:
-            /admin/audit).
+            <Badge variant="outline">Audit</Badge> {t('about.sec_audit_text')}
           </div>
           <div>
-            <Badge variant="outline">Calc</Badge> Чистые функции, golden-тест с Tolly Group, расхождение &lt; 0.5%.
+            <Badge variant="outline">Calc</Badge> {t('about.sec_calc_text')}
           </div>
           <div>
-            <Badge variant="outline">Queue</Badge> NATS JetStream для расчётных задач (stream SCENARIO_CALC). Inline
-            fallback если NATS недоступен.
+            <Badge variant="outline">Queue</Badge> {t('about.sec_queue_text')}
           </div>
         </CardContent>
       </Card>
@@ -126,7 +122,7 @@ export default function AboutPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <BookOpen className="w-5 h-5" />
-            Стек
+            {t('about.card_stack')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm grid grid-cols-2 gap-2">

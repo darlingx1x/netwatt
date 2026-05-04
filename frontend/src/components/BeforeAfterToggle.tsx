@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AnimatedCounter } from '@/components/ui/animated-counter'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Zap } from 'lucide-react'
@@ -14,6 +15,7 @@ export function BeforeAfterToggle({
   baseMoney: number
   optMoney: number
 }) {
+  const { t } = useTranslation()
   const [mode, setMode] = useState<'before' | 'after'>('after')
   const kwh = mode === 'before' ? baseKwh : optKwh
   const money = mode === 'before' ? baseMoney : optMoney
@@ -23,7 +25,7 @@ export function BeforeAfterToggle({
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base flex items-center gap-2">
           <Zap className="w-5 h-5 text-amber-500" />
-          С политиками или без?
+          {t('result.before_after_title')}
         </CardTitle>
         <div className="inline-flex rounded-md border border-border p-0.5 text-xs">
           <button
@@ -35,7 +37,7 @@ export function BeforeAfterToggle({
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            До
+            {t('result.before')}
           </button>
           <button
             type="button"
@@ -46,24 +48,24 @@ export function BeforeAfterToggle({
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            После
+            {t('result.after')}
           </button>
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">Потребление / год</div>
+            <div className="text-xs text-muted-foreground uppercase tracking-wider">{t('result.consumption_per_year')}</div>
             <div className="mt-2 flex items-baseline gap-2">
               <AnimatedCounter value={Math.round(kwh)} fontSize={40} />
-              <span className="text-sm text-muted-foreground">кВт·ч</span>
+              <span className="text-sm text-muted-foreground">{t('common.kwh')}</span>
             </div>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wider">Стоимость / год</div>
+            <div className="text-xs text-muted-foreground uppercase tracking-wider">{t('result.cost_per_year')}</div>
             <div className="mt-2 flex items-baseline gap-2">
               <AnimatedCounter value={Math.round(money)} fontSize={40} />
-              <span className="text-sm text-muted-foreground">сум</span>
+              <span className="text-sm text-muted-foreground">{t('common.uzs')}</span>
             </div>
           </div>
         </div>
@@ -77,8 +79,8 @@ export function BeforeAfterToggle({
         </div>
         <div className="mt-2 text-xs text-muted-foreground">
           {mode === 'after'
-            ? `Экономия ${(((baseKwh - optKwh) / Math.max(baseKwh, 1)) * 100).toFixed(1)}% благодаря активным политикам`
-            : `Базовый сценарий без оптимизации — 100%`}
+            ? t('result.saving_pct_due_policies', { pct: (((baseKwh - optKwh) / Math.max(baseKwh, 1)) * 100).toFixed(1) })
+            : t('result.base_no_optimization')}
         </div>
       </CardContent>
     </Card>

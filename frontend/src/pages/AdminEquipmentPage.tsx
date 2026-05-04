@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/api/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -52,6 +53,7 @@ const emptyForm = {
 }
 
 export default function AdminEquipmentPage() {
+  const { t } = useTranslation()
   const qc = useQueryClient()
   const [filter, setFilter] = useState('')
   const { data, isLoading } = useQuery({
@@ -112,10 +114,10 @@ export default function AdminEquipmentPage() {
   return (
     <div className="space-y-6 max-w-6xl">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Оборудование</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('admin_eq.heading')}</h1>
         <div className="flex items-center gap-2 flex-wrap">
           <Input
-            placeholder="Поиск по вендору/модели…"
+            placeholder={t('admin_eq.search_placeholder')}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="w-60"
@@ -137,26 +139,26 @@ export default function AdminEquipmentPage() {
             disabled={importJson.isPending}
           >
             <Upload className="w-4 h-4 mr-1" />
-            Импорт JSON
+            {t('admin_eq.import_json')}
           </Button>
-          {data && <span className="text-sm text-muted-foreground">{data.total} моделей</span>}
+          {data && <span className="text-sm text-muted-foreground">{t('admin_eq.models_count', { count: data.total })}</span>}
         </div>
       </div>
 
       {importReport && (
         <Card className="border-primary/40 bg-primary/5">
           <CardContent className="py-3 flex flex-wrap gap-4 text-sm">
-            <span>Импорт: <strong>{importReport.total}</strong> записей</span>
-            <span>создано <strong>{importReport.created}</strong></span>
-            <span>обновлено <strong>{importReport.updated}</strong></span>
+            <span>{t('admin_eq.import_records', { count: importReport.total })}</span>
+            <span>{t('admin_eq.import_created')} <strong>{importReport.created}</strong></span>
+            <span>{t('admin_eq.import_updated')} <strong>{importReport.updated}</strong></span>
             <span className={importReport.errors.length ? 'text-destructive' : ''}>
-              ошибок <strong>{importReport.errors.length}</strong>
+              {t('admin_eq.import_errors')} <strong>{importReport.errors.length}</strong>
             </span>
             <button
               className="ml-auto text-xs text-muted-foreground hover:text-foreground"
               onClick={() => setImportReport(null)}
             >
-              закрыть
+              {t('common.close')}
             </button>
           </CardContent>
         </Card>
@@ -166,15 +168,15 @@ export default function AdminEquipmentPage() {
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            Добавить модель
+            {t('admin_eq.add_model')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <LabeledInput label="Вендор" value={form.vendor} onChange={(v) => setForm({ ...form, vendor: v })} />
-            <LabeledInput label="Модель" value={form.model} onChange={(v) => setForm({ ...form, model: v })} />
+            <LabeledInput label={t('admin_eq.vendor')} value={form.vendor} onChange={(v) => setForm({ ...form, vendor: v })} />
+            <LabeledInput label={t('admin_eq.model')} value={form.model} onChange={(v) => setForm({ ...form, model: v })} />
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Категория</label>
+              <label className="text-xs text-muted-foreground mb-1 block">{t('admin_eq.category')}</label>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -188,51 +190,51 @@ export default function AdminEquipmentPage() {
               </select>
             </div>
             <LabeledNumber
-              label="Год выпуска"
+              label={t('admin_eq.year_released')}
               value={form.year_released}
               onChange={(v) => setForm({ ...form, year_released: v })}
             />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
             <LabeledNumber
-              label="Портов всего"
+              label={t('admin_eq.ports_total')}
               value={form.ports_total}
               onChange={(v) => setForm({ ...form, ports_total: v })}
             />
             <LabeledNumber
-              label="PoE портов"
+              label={t('admin_eq.poe_ports')}
               value={form.poe_ports}
               onChange={(v) => setForm({ ...form, poe_ports: v })}
             />
             <LabeledNumber
-              label="PoE бюджет, Вт"
+              label={t('admin_eq.poe_budget_w')}
               value={form.poe_budget_w}
               onChange={(v) => setForm({ ...form, poe_budget_w: v })}
             />
             <LabeledNumber
-              label="P_idle, Вт"
+              label={t('admin_eq.p_idle_w')}
               value={form.p_idle_w}
               onChange={(v) => setForm({ ...form, p_idle_w: v })}
             />
             <LabeledNumber
-              label="P_max, Вт"
+              label={t('admin_eq.p_max_w')}
               value={form.p_max_w}
               onChange={(v) => setForm({ ...form, p_max_w: v })}
             />
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <Checkbox
-              label="EEE (802.3az)"
+              label={t('admin_eq.eee')}
               value={form.eee_supported}
               onChange={(v) => setForm({ ...form, eee_supported: v })}
             />
             <Checkbox
-              label="ALR"
+              label={t('admin_eq.alr')}
               value={form.alr_supported}
               onChange={(v) => setForm({ ...form, alr_supported: v })}
             />
             <Checkbox
-              label="PoE Scheduling"
+              label={t('admin_eq.poe_sched')}
               value={form.poe_scheduling}
               onChange={(v) => setForm({ ...form, poe_scheduling: v })}
             />
@@ -241,7 +243,7 @@ export default function AdminEquipmentPage() {
               disabled={!form.vendor || !form.model || create.isPending}
               onClick={() => create.mutate()}
             >
-              Добавить
+              {t('admin_eq.add')}
             </Button>
           </div>
         </CardContent>
@@ -257,7 +259,7 @@ export default function AdminEquipmentPage() {
                   <span className="font-medium">{e.vendor}</span>{' '}
                   <span className="text-muted-foreground">{e.model}</span>
                   <div className="text-xs text-muted-foreground">
-                    {e.category} · порты {e.ports_total}
+                    {e.category} · {t('catalog.ports').toLowerCase()} {e.ports_total}
                     {e.poe_ports > 0 && ` (PoE ${e.poe_ports}, ${Math.round(Number(e.poe_budget_w))}W)`}
                     {e.year_released && ` · ${e.year_released}`}
                   </div>
@@ -272,8 +274,8 @@ export default function AdminEquipmentPage() {
                 </div>
                 <DeleteButton
                   id={String(e.id)}
-                  deleteText="Удалить"
-                  cancelText="Отмена"
+                  deleteText={t('common.delete')}
+                  cancelText={t('common.cancel')}
                   onDelete={() => del.mutate(e.id)}
                 />
               </CardContent>

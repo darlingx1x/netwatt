@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface PerDevice {
@@ -47,17 +48,17 @@ const COLORS: Record<Node['category'], string> = {
   other: '#64748b',
 }
 
-const LABELS: Record<Node['category'], string> = {
-  core: 'Core',
-  dist: 'Distribution',
-  access: 'Access',
-  server: 'Servers',
-  router: 'Routers',
-  ap: 'Wi-Fi',
-  other: 'Other',
-}
-
 export function NetworkTopology({ perDevice }: { perDevice: PerDevice[] }) {
+  const { t } = useTranslation()
+  const LABELS: Record<Node['category'], string> = {
+    core: t('topology.core'),
+    dist: t('topology.dist'),
+    access: t('topology.access'),
+    server: t('topology.server'),
+    router: t('topology.router'),
+    ap: t('topology.ap'),
+    other: t('topology.other'),
+  }
   const { nodes, links, totals } = useMemo(() => {
     const grouped = new Map<Node['category'], { qty: number; baseTotal: number; optTotal: number; label: string }>()
     for (const d of perDevice) {
@@ -125,7 +126,8 @@ export function NetworkTopology({ perDevice }: { perDevice: PerDevice[] }) {
       optTotal: entries.reduce((a, [, e]) => a + e.optTotal, 0),
     }
     return { nodes, links, totals, width, height }
-  }, [perDevice])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [perDevice, t])
 
   if (nodes.length === 0) return null
 
@@ -134,16 +136,16 @@ export function NetworkTopology({ perDevice }: { perDevice: PerDevice[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Топология сети и потоки энергии</CardTitle>
+        <CardTitle className="text-base">{t('result.topology')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-center gap-3 mb-2 text-xs text-muted-foreground">
           <span>
-            E_base <span className="font-mono text-foreground">{Math.round(totals.baseTotal).toLocaleString()}</span> кВт·ч
+            E_base <span className="font-mono text-foreground">{Math.round(totals.baseTotal).toLocaleString()}</span> {t('common.kwh')}
           </span>
           <span>→</span>
           <span>
-            E_opt <span className="font-mono text-foreground">{Math.round(totals.optTotal).toLocaleString()}</span> кВт·ч
+            E_opt <span className="font-mono text-foreground">{Math.round(totals.optTotal).toLocaleString()}</span> {t('common.kwh')}
           </span>
           <span className="ml-auto font-mono text-emerald-600">−{savingPct.toFixed(1)}%</span>
         </div>
@@ -247,7 +249,7 @@ export function NetworkTopology({ perDevice }: { perDevice: PerDevice[] }) {
           ))}
           <div className="flex items-center gap-1.5 ml-auto">
             <span className="w-3 h-1 border-t-2 border-dashed border-emerald-500" />
-            <span className="text-muted-foreground">поток экономии</span>
+            <span className="text-muted-foreground">{t('result.saving_flow')}</span>
           </div>
         </div>
       </CardContent>

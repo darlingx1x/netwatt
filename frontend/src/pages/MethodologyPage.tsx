@@ -1,141 +1,136 @@
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 
 export default function MethodologyPage() {
+  const { t } = useTranslation()
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Методология расчёта</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('methodology.heading')}</h1>
         <p className="text-muted-foreground">
-          Формулы 2.1–2.12 из ВКР · реализованы в <code>backend/src/netwatt/calc/formulas.py</code>
+          {t('methodology.subtitle_prefix')} <code>backend/src/netwatt/calc/formulas.py</code>
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Базовое потребление устройства</CardTitle>
+          <CardTitle className="text-base">{t('methodology.card_base')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <Formula
             id="2.1"
-            label="Мгновенная мощность при нагрузке u"
+            label={t('methodology.f21_label')}
             expr={'P(u) = P_idle + (P_max − P_idle) · u'}
-            notes="Линейная модель. u ∈ [0, 1]. Типично P_idle ≈ 0.3·P_max для Ethernet-коммутаторов."
+            notes={t('methodology.f21_notes')}
           />
           <Formula
             id="2.2"
-            label="Годовое потребление"
-            expr={'E_base = 8760 · P(ū) / 1000   [кВт·ч/год]'}
-            notes="ū — средневзвешенная загрузка по профилю трафика (день/пик/ночь)."
+            label={t('methodology.f22_label')}
+            expr={'E_base = 8760 · P(ū) / 1000   [' + t('common.kwh_per_year') + ']'}
+            notes={t('methodology.f22_notes')}
           />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Политики энергосбережения (Δ-формулы)</CardTitle>
+          <CardTitle className="text-base">{t('methodology.card_policies')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <Formula
             id="2.3"
-            label="IEEE 802.3az Energy-Efficient Ethernet"
+            label={t('methodology.f23_label')}
             expr={'ΔE_EEE = N · (ΔP/N) · (1 − ū) · η · 8760 / 1000'}
-            notes="N — число портов; η ∈ [0.2, 0.7] — коэффициент эффективности EEE; (1−ū) — доля простоя."
+            notes={t('methodology.f23_notes')}
           />
           <Formula
             id="2.4"
-            label="Adaptive Link Rate (снижение скорости)"
+            label={t('methodology.f24_label')}
             expr={'ΔE_ALR = (P_max − P_idle) · drop · h_low · 365 / 1000'}
-            notes="h_low — часы низкой нагрузки в сутках; drop ∈ [0.3, 0.5] — падение энергии при снижении скорости."
+            notes={t('methodology.f24_notes')}
           />
           <Formula
             id="2.5"
-            label="PoE Scheduling"
+            label={t('methodology.f25_label')}
             expr={'ΔE_PoE = PoE_budget · h_off · 365 / 1000'}
-            notes="h_off — часы отключения PoE в сутках (до 14ч). Экономия = полный PoE-бюджет × время."
+            notes={t('methodology.f25_notes')}
           />
           <Formula
             id="2.6"
-            label="Server Consolidation"
+            label={t('methodology.f26_label')}
             expr={'ΔE_consol = (N_total − N_min) · P_idle_server · h_night · 365 / 1000'}
-            notes="Выключение избыточных серверов в непиковые часы после миграции нагрузки."
+            notes={t('methodology.f26_notes')}
           />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Агрегация и экономические показатели</CardTitle>
+          <CardTitle className="text-base">{t('methodology.card_aggregate')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <Formula
             id="2.7"
-            label="Оптимизированное потребление"
+            label={t('methodology.f27_label')}
             expr={'E_opt = E_base − (ΔE_EEE + ΔE_ALR + ΔE_PoE + ΔE_consol)'}
-            notes="Инвариант: E_opt ≤ E_base (проверяется hypothesis property-based тестом)."
+            notes={t('methodology.f27_notes')}
           />
           <Formula
             id="2.8"
-            label="Годовая стоимость по трёхставочному тарифу РУз"
+            label={t('methodology.f28_label')}
             expr={'C_year = E_day · T_day + E_peak · T_peak + E_night · T_night'}
-            notes="Тарифы T — сум/кВт·ч. Бизнес 2025: 1050/1450/450. Бюджет 2025: 600/900/300."
+            notes={t('methodology.f28_notes')}
           />
           <Formula
             id="2.9"
-            label="Окупаемость (простая)"
-            expr={'T_payback = CAPEX / (C_base − C_opt)   [лет]'}
-            notes="Если экономия ≤ 0, окупаемость не определена."
+            label={t('methodology.f29_label')}
+            expr={'T_payback = CAPEX / (C_base − C_opt)   [' + t('result.payback_years') + ']'}
+            notes={t('methodology.f29_notes')}
           />
           <Formula
             id="2.10"
-            label="Чистая приведённая стоимость"
+            label={t('methodology.f210_label')}
             expr={'NPV = Σ(t=1..N) CF_t / (1+r)^t − CAPEX'}
-            notes="r — ставка дисконтирования (обычно 12%). Положительный NPV означает целесообразность инвестиций."
+            notes={t('methodology.f210_notes')}
           />
           <Formula
             id="2.11"
-            label="Снижение выбросов CO₂"
+            label={t('methodology.f211_label')}
             expr={'CO₂_saved = ΔE · EF_grid'}
-            notes="EF_grid = 0.468 кг CO₂/кВт·ч (МЭ РУз 2024). Для РФ — 0.38, для ЕС — 0.25."
+            notes={t('methodology.f211_notes')}
           />
           <Formula
             id="2.12"
-            label="Средневзвешенная загрузка"
+            label={t('methodology.f212_label')}
             expr={'ū = (u_day · h_day + u_peak · h_peak + u_night · h_night) / (h_day + h_peak + h_night)'}
-            notes="Используется в формулах 2.1 и 2.3. Часы должны суммироваться в 24."
+            notes={t('methodology.f212_notes')}
           />
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Валидация модели</CardTitle>
+          <CardTitle className="text-base">{t('methodology.card_validation')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="flex items-start gap-2">
-            <Badge>Golden test</Badge>
+            <Badge>{t('methodology.valid_golden_badge')}</Badge>
             <div>
-              Эталонный сценарий «6 × Cisco Catalyst 9200L + 2 × Dell R650» сверяется с ручным расчётом по калькулятору
-              из ВКР. Расхождение &lt; 0.5% (допуск установлен в{' '}
+              {t('methodology.valid_golden_text')}{' '}
               <code>tests/test_calc.py::test_golden_corp_network_120_ports</code>).
             </div>
           </div>
           <Separator />
           <div className="flex items-start gap-2">
-            <Badge>Property-based</Badge>
-            <div>
-              Hypothesis генерирует случайные профили трафика и проверяет инвариант E_opt ≤ E_base для любых комбинаций
-              политик. Отрицательных экономий — нет.
-            </div>
+            <Badge>{t('methodology.valid_property_badge')}</Badge>
+            <div>{t('methodology.valid_property_text')}</div>
           </div>
           <Separator />
           <div className="flex items-start gap-2">
-            <Badge>Данные</Badge>
-            <div>
-              Параметры 50 моделей взяты из datasheet вендоров и отчётов Tolly Group. Где явные данные отсутствуют —
-              применяется аппроксимация P_idle ≈ 0.35 · P_max (типичное соотношение для Ethernet-коммутаторов).
-            </div>
+            <Badge>{t('methodology.valid_data_badge')}</Badge>
+            <div>{t('methodology.valid_data_text')}</div>
           </div>
         </CardContent>
       </Card>

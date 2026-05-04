@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { CalendarIcon, X } from 'lucide-react'
 import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
@@ -13,7 +14,8 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ value, onChange, placeholder, className, disabled, lang = 'ru' }: DatePickerProps) {
-  const resolvedPlaceholder = placeholder ?? (lang === 'ru' ? 'Выберите дату' : 'Sanani tanlang')
+  const { t } = useTranslation()
+  const resolvedPlaceholder = placeholder ?? t('datepicker.placeholder')
   const [open, setOpen] = useState(false)
   const [openUp, setOpenUp] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -43,8 +45,9 @@ export function DatePicker({ value, onChange, placeholder, className, disabled, 
     }
   }, [open])
 
+  const localeMap: Record<string, string> = { ru: 'ru-RU', uz: 'uz-UZ', en: 'en-US' }
   const formatted = value
-    ? value.toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uz-UZ', { day: '2-digit', month: 'short', year: 'numeric' })
+    ? value.toLocaleDateString(localeMap[lang] ?? 'ru-RU', { day: '2-digit', month: 'short', year: 'numeric' })
     : null
 
   return (

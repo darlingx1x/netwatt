@@ -97,7 +97,7 @@ export default function ScenarioResultPage() {
 
   if (data.status === 'failed' || !data.result) {
     return (
-      <div className="text-destructive">Error / no result</div>
+      <div className="text-destructive">{t('result.no_result')}</div>
     )
   }
 
@@ -160,19 +160,19 @@ export default function ScenarioResultPage() {
           icon={<Zap className="w-5 h-5" />}
           label={t('result.kpi_savings_kwh')}
           value={Math.round(savingsKwh)}
-          unit="кВт·ч/год"
+          unit={t('common.kwh_per_year')}
         />
         <KpiCard
           icon={<DollarSign className="w-5 h-5" />}
           label={t('result.kpi_savings_money')}
           value={Math.round(savingsMoney)}
-          unit="сум/год"
+          unit={t('common.uzs_per_year')}
         />
         <KpiCard
           icon={<Leaf className="w-5 h-5 text-green-600" />}
           label={t('result.kpi_co2')}
           value={Math.round(co2)}
-          unit="кг/год"
+          unit={t('common.kg_per_year')}
         />
       </div>
 
@@ -189,7 +189,7 @@ export default function ScenarioResultPage() {
               <div>
                 <div className="text-xs text-muted-foreground">{t('result.npv')}</div>
                 <div className="text-lg font-semibold">
-                  {Math.round(Number(r.npv)).toLocaleString()} сум
+                  {Math.round(Number(r.npv)).toLocaleString()} {t('common.uzs')}
                 </div>
               </div>
             )}

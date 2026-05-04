@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/api/client'
 import { useAuth } from '@/store/auth'
@@ -50,6 +51,7 @@ export function CommandPalette() {
   const [query, setQuery] = useState('')
   const [cursor, setCursor] = useState(0)
   const nav = useNavigate()
+  const { t } = useTranslation()
   const { user, logout, accessToken } = useAuth()
   const { lang, setLang, theme, setTheme } = useUi()
   const isAdmin = user?.role === 'admin'
@@ -89,88 +91,88 @@ export function CommandPalette() {
     const cmds: Command[] = [
       {
         id: 'new',
-        label: 'Новый сценарий',
-        hint: 'открыть wizard',
+        label: t('command_palette.new_scenario'),
+        hint: t('command_palette.new_scenario_hint'),
         icon: Plus,
         run: () => nav('/scenarios/new'),
-        group: 'Действия',
+        group: t('command_palette.group_actions'),
       },
       {
         id: 'scenarios',
-        label: 'Сценарии',
+        label: t('command_palette.scenarios'),
         icon: FolderKanban,
         run: () => nav('/scenarios'),
-        group: 'Навигация',
+        group: t('command_palette.group_navigation'),
       },
       {
         id: 'catalog',
-        label: 'Каталог оборудования',
+        label: t('command_palette.catalog'),
         icon: BookOpen,
         run: () => nav('/catalog'),
-        group: 'Навигация',
+        group: t('command_palette.group_navigation'),
       },
       {
         id: 'methodology',
-        label: 'Методология',
+        label: t('command_palette.methodology'),
         icon: FunctionSquare,
         run: () => nav('/methodology'),
-        group: 'Навигация',
+        group: t('command_palette.group_navigation'),
       },
       {
         id: 'about',
-        label: 'О системе',
+        label: t('command_palette.about'),
         icon: Info,
         run: () => nav('/about'),
-        group: 'Навигация',
+        group: t('command_palette.group_navigation'),
       },
       {
         id: 'theme',
-        label: theme === 'dark' ? 'Светлая тема' : 'Тёмная тема',
+        label: theme === 'dark' ? t('command_palette.theme_light') : t('command_palette.theme_dark'),
         icon: theme === 'dark' ? Sun : Moon,
         run: () => setTheme(theme === 'dark' ? ('light' as Theme) : ('dark' as Theme)),
-        group: 'Настройки',
+        group: t('command_palette.group_settings'),
       },
       {
         id: 'lang-ru',
-        label: 'Русский',
-        hint: lang === 'ru' ? 'текущий' : '',
+        label: t('command_palette.russian'),
+        hint: lang === 'ru' ? t('common.current') : '',
         icon: Languages,
         run: () => setLang('ru' as Lang),
-        group: 'Язык',
+        group: t('command_palette.group_language'),
       },
       {
         id: 'lang-uz',
-        label: 'O‘zbekcha',
-        hint: lang === 'uz' ? 'текущий' : '',
+        label: t('command_palette.uzbek'),
+        hint: lang === 'uz' ? t('common.current') : '',
         icon: Languages,
         run: () => setLang('uz' as Lang),
-        group: 'Язык',
+        group: t('command_palette.group_language'),
       },
       {
         id: 'lang-en',
-        label: 'English',
-        hint: lang === 'en' ? 'текущий' : '',
+        label: t('command_palette.english'),
+        hint: lang === 'en' ? t('common.current') : '',
         icon: Languages,
         run: () => setLang('en' as Lang),
-        group: 'Язык',
+        group: t('command_palette.group_language'),
       },
       {
         id: 'logout',
-        label: 'Выйти',
+        label: t('command_palette.logout'),
         icon: LogOut,
         run: () => {
           logout()
           nav('/login')
         },
-        group: 'Настройки',
+        group: t('command_palette.group_settings'),
       },
     ]
     if (isAdmin) {
       cmds.push(
-        { id: 'users', label: 'Пользователи', icon: Users, run: () => nav('/admin/users'), group: 'Админка' },
-        { id: 'eq', label: 'Оборудование (админ)', icon: Server, run: () => nav('/admin/equipment'), group: 'Админка' },
-        { id: 'audit', label: 'Журнал аудита', icon: ScrollText, run: () => nav('/admin/audit'), group: 'Админка' },
-        { id: 'sessions', label: 'Сессии auth_tokens', icon: KeyRound, run: () => nav('/admin/sessions'), group: 'Админка' },
+        { id: 'users', label: t('command_palette.users'), icon: Users, run: () => nav('/admin/users'), group: t('command_palette.group_admin') },
+        { id: 'eq', label: t('command_palette.equipment_admin'), icon: Server, run: () => nav('/admin/equipment'), group: t('command_palette.group_admin') },
+        { id: 'audit', label: t('command_palette.audit'), icon: ScrollText, run: () => nav('/admin/audit'), group: t('command_palette.group_admin') },
+        { id: 'sessions', label: t('command_palette.sessions'), icon: KeyRound, run: () => nav('/admin/sessions'), group: t('command_palette.group_admin') },
       )
     }
     for (const s of scenarios ?? []) {
@@ -181,7 +183,7 @@ export function CommandPalette() {
         icon: FolderKanban,
         run: () => nav(`/scenarios/${s.id}`),
         keywords: `scenario ${s.status} #${s.id}`,
-        group: 'Сценарии',
+        group: t('command_palette.group_scenarios'),
       })
       if (s.status === 'ready') {
         cmds.push({
@@ -190,7 +192,7 @@ export function CommandPalette() {
           icon: FileText,
           run: () => downloadReport(s.id, 'pdf', accessToken),
           keywords: `pdf export ${s.id}`,
-          group: 'Экспорт',
+          group: t('command_palette.group_export'),
         })
         cmds.push({
           id: `xlsx-${s.id}`,
@@ -198,7 +200,7 @@ export function CommandPalette() {
           icon: FileSpreadsheet,
           run: () => downloadReport(s.id, 'xlsx', accessToken),
           keywords: `xlsx export ${s.id}`,
-          group: 'Экспорт',
+          group: t('command_palette.group_export'),
         })
       }
     }
@@ -210,11 +212,11 @@ export function CommandPalette() {
         icon: Server,
         run: () => nav(`/catalog?highlight=${eq.id}`),
         keywords: `equipment ${eq.vendor} ${eq.model} ${eq.category}`,
-        group: 'Оборудование',
+        group: t('command_palette.group_equipment'),
       })
     }
     return cmds
-  }, [scenarios, equipment, theme, lang, isAdmin, accessToken, nav, setLang, setTheme, logout])
+  }, [scenarios, equipment, theme, lang, isAdmin, accessToken, nav, setLang, setTheme, logout, t])
 
   const filtered = useMemo(() => {
     if (!query) return commands
@@ -275,7 +277,7 @@ export function CommandPalette() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Команды, сценарии, оборудование…"
+            placeholder={t('command_palette.placeholder')}
             className="flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
           />
           <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">ESC</kbd>
@@ -283,7 +285,7 @@ export function CommandPalette() {
         <div className="max-h-[60vh] overflow-y-auto py-1">
           {grouped.length === 0 && (
             <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-              Ничего не найдено
+              {t('command_palette.nothing_found')}
             </div>
           )}
           {grouped.map(([group, items]) => (
@@ -322,13 +324,13 @@ export function CommandPalette() {
         <div className="border-t border-border px-3 py-1.5 flex items-center gap-3 text-[10px] text-muted-foreground">
           <span>
             <kbd className="px-1 py-0.5 rounded bg-muted font-mono">↑</kbd>
-            <kbd className="px-1 py-0.5 rounded bg-muted font-mono ml-1">↓</kbd> навигация
+            <kbd className="px-1 py-0.5 rounded bg-muted font-mono ml-1">↓</kbd> {t('command_palette.kbd_navigate')}
           </span>
           <span>
-            <kbd className="px-1 py-0.5 rounded bg-muted font-mono">↵</kbd> выбрать
+            <kbd className="px-1 py-0.5 rounded bg-muted font-mono">↵</kbd> {t('command_palette.kbd_select')}
           </span>
           <span className="ml-auto">
-            <kbd className="px-1 py-0.5 rounded bg-muted font-mono">⌘K</kbd> открыть
+            <kbd className="px-1 py-0.5 rounded bg-muted font-mono">⌘K</kbd> {t('command_palette.kbd_open')}
           </span>
         </div>
       </div>

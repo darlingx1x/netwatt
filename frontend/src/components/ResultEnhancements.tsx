@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Area,
   AreaChart,
@@ -53,6 +54,7 @@ export function RoiProjectionChart({
   discount?: number
   years?: number
 }) {
+  const { t } = useTranslation()
   const data = useMemo(() => {
     const rows: Array<{ year: string; cum: number; savings: number; discounted: number }> = []
     let cum = -investment
@@ -82,22 +84,22 @@ export function RoiProjectionChart({
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-emerald-600" />
-          Кумулятивная экономия за {years} лет
+          {t('result.cumulative_savings', { years })}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="mb-4 grid grid-cols-3 gap-3 text-sm">
           <div>
-            <div className="text-muted-foreground text-xs">Суммарно</div>
+            <div className="text-muted-foreground text-xs">{t('result.total_sum')}</div>
             <div className="text-2xl font-bold text-emerald-600">
               {Math.round(cumTotal).toLocaleString()}
             </div>
-            <div className="text-xs text-muted-foreground">сум</div>
+            <div className="text-xs text-muted-foreground">{t('common.uzs')}</div>
           </div>
           <div>
-            <div className="text-muted-foreground text-xs">Окупаемость</div>
+            <div className="text-muted-foreground text-xs">{t('result.payback')}</div>
             <div className="text-2xl font-bold">
-              {payback} <span className="text-sm text-muted-foreground">лет</span>
+              {payback} <span className="text-sm text-muted-foreground">{t('result.payback_years')}</span>
             </div>
           </div>
           <div>
@@ -105,7 +107,7 @@ export function RoiProjectionChart({
             <div className="text-2xl font-bold text-blue-600">
               {Math.round((data[data.length - 1]?.discounted ?? 0) - investment).toLocaleString()}
             </div>
-            <div className="text-xs text-muted-foreground">сум</div>
+            <div className="text-xs text-muted-foreground">{t('common.uzs')}</div>
           </div>
         </div>
         <ResponsiveContainer width="100%" height={220}>
@@ -113,12 +115,12 @@ export function RoiProjectionChart({
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis dataKey="year" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1_000_000).toFixed(1)}M`} />
-            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} сум`} />
+            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} ${t('common.uzs')}`} />
             <Legend />
             <Area
               type="monotone"
               dataKey="cum"
-              name="Накопленная выгода"
+              name={t('result.cumulative_savings', { years })}
               stroke="#059669"
               fill="#10b981"
               fillOpacity={0.3}
@@ -126,7 +128,7 @@ export function RoiProjectionChart({
             <Area
               type="monotone"
               dataKey="discounted"
-              name="Дисконтированная (NPV)"
+              name={`${t('result.npv')} (NPV)`}
               stroke="#2563eb"
               fill="#3b82f6"
               fillOpacity={0.15}
@@ -139,6 +141,7 @@ export function RoiProjectionChart({
 }
 
 export function PolicyDistributionPie({ breakdown }: { breakdown: Breakdown }) {
+  const { t } = useTranslation()
   const data = [
     { name: 'EEE', value: breakdown.eee, color: '#1e3a8a' },
     { name: 'ALR', value: breakdown.alr, color: '#059669' },
@@ -151,7 +154,7 @@ export function PolicyDistributionPie({ breakdown }: { breakdown: Breakdown }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Вклад политик в общую экономию</CardTitle>
+        <CardTitle className="text-base">{t('result.policy_share')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={240}>
@@ -172,7 +175,7 @@ export function PolicyDistributionPie({ breakdown }: { breakdown: Breakdown }) {
                 <Cell key={d.name} fill={d.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} кВт·ч`} />
+            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} ${t('common.kwh')}`} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
@@ -181,6 +184,7 @@ export function PolicyDistributionPie({ breakdown }: { breakdown: Breakdown }) {
 }
 
 export function DeviceCategoryPie({ perDevice }: { perDevice: PerDevice[] }) {
+  const { t } = useTranslation()
   const categoryMap = new Map<string, number>()
   for (const d of perDevice) {
     const prev = categoryMap.get(d.vendor) ?? 0
@@ -193,7 +197,7 @@ export function DeviceCategoryPie({ perDevice }: { perDevice: PerDevice[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Потребление по вендорам</CardTitle>
+        <CardTitle className="text-base">{t('result.vendor_share')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={240}>
@@ -213,7 +217,7 @@ export function DeviceCategoryPie({ perDevice }: { perDevice: PerDevice[] }) {
                 <Cell key={d.name} fill={d.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} кВт·ч/год`} />
+            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} ${t('common.kwh_per_year')}`} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
@@ -234,6 +238,7 @@ export function SensitivityPanel({
   initialAlrDrop?: number
   initialPoeOffHours?: number
 }) {
+  const { t } = useTranslation()
   const [eta, setEta] = useState(initialEta)
   const [alrDrop, setAlrDrop] = useState(initialAlrDrop)
   const [poeHours, setPoeHours] = useState(initialPoeOffHours)
@@ -262,13 +267,13 @@ export function SensitivityPanel({
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <Sliders className="w-5 h-5 text-blue-600" />
-          What-if: чувствительность к параметрам
+          {t('result.what_if')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid md:grid-cols-3 gap-4">
           <Slider
-            label="η_EEE (эффективность EEE)"
+            label={t('result.what_if_eta_label')}
             value={eta}
             onChange={setEta}
             min={0.1}
@@ -277,7 +282,7 @@ export function SensitivityPanel({
             format={(v) => v.toFixed(2)}
           />
           <Slider
-            label="ALR drop (снижение при low-traffic)"
+            label={t('result.what_if_alr_label')}
             value={alrDrop}
             onChange={setAlrDrop}
             min={0.1}
@@ -286,31 +291,31 @@ export function SensitivityPanel({
             format={(v) => v.toFixed(2)}
           />
           <Slider
-            label="PoE off hours / day"
+            label={t('result.what_if_poe_label')}
             value={poeHours}
             onChange={setPoeHours}
             min={0}
             max={20}
             step={1}
-            format={(v) => `${v} ч`}
+            format={(v) => `${v} ${t('common.hour_short')}`}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-2 border-t">
           <div>
-            <div className="text-xs text-muted-foreground">Прогнозируемая экономия</div>
+            <div className="text-xs text-muted-foreground">{t('result.what_if_projected')}</div>
             <div className="text-2xl font-bold text-emerald-600">
-              {projectedKwh.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">кВт·ч/год</span>
+              {projectedKwh.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">{t('common.kwh_per_year')}</span>
             </div>
             <Badge variant={projectedKwh > baseSavingsKwh ? 'default' : 'secondary'}>
               {projectedKwh > baseSavingsKwh ? '+' : ''}
-              {(((projectedKwh - baseSavingsKwh) / Math.max(1, baseSavingsKwh)) * 100).toFixed(1)}% от базы
+              {(((projectedKwh - baseSavingsKwh) / Math.max(1, baseSavingsKwh)) * 100).toFixed(1)}% {t('result.what_if_vs_base')}
             </Badge>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground">В деньгах</div>
+            <div className="text-xs text-muted-foreground">{t('result.what_if_in_money')}</div>
             <div className="text-2xl font-bold">
-              {projectedUzs.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">сум/год</span>
+              {projectedUzs.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">{t('common.uzs_per_year')}</span>
             </div>
           </div>
         </div>
@@ -320,12 +325,12 @@ export function SensitivityPanel({
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis dataKey="eta" tick={{ fontSize: 10 }} label={{ value: 'η_EEE', position: 'bottom', fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} кВт·ч`} />
+            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} ${t('common.kwh')}`} />
             <Line type="monotone" dataKey="kwh" stroke="#1e3a8a" strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
         <p className="text-xs text-muted-foreground">
-          ⚠ Прогноз — линейная аппроксимация. Точный расчёт — кнопкой «Пересчитать» после редактирования сценария.
+          {t('result.what_if_disclaimer')}
         </p>
       </CardContent>
     </Card>
@@ -369,6 +374,7 @@ function Slider({
 }
 
 export function DeviceHealthBars({ perDevice }: { perDevice: PerDevice[] }) {
+  const { t } = useTranslation()
   const data = perDevice
     .map((d) => ({
       name: `${d.vendor} ${d.model}`.slice(0, 25),
@@ -381,7 +387,7 @@ export function DeviceHealthBars({ perDevice }: { perDevice: PerDevice[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Экономия по устройствам (base → opt)</CardTitle>
+        <CardTitle className="text-base">{t('result.device_health')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={Math.max(200, data.length * 40)}>
@@ -389,10 +395,10 @@ export function DeviceHealthBars({ perDevice }: { perDevice: PerDevice[] }) {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
             <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={80} />
-            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} кВт·ч`} />
+            <Tooltip formatter={(v: number) => `${Math.round(v).toLocaleString()} ${t('common.kwh')}`} />
             <Legend />
-            <Bar dataKey="opt" stackId="a" fill="#1e3a8a" name="После оптимизации" />
-            <Bar dataKey="saving" stackId="a" fill="#10b981" name="Экономия" />
+            <Bar dataKey="opt" stackId="a" fill="#1e3a8a" name={t('result.after_opt')} />
+            <Bar dataKey="saving" stackId="a" fill="#10b981" name={t('result.saving')} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/api/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,6 +25,7 @@ const methodColor: Record<string, 'default' | 'secondary' | 'outline' | 'destruc
 }
 
 export default function AdminAuditPage() {
+  const { t } = useTranslation()
   const [entity, setEntity] = useState('')
   const { data, isLoading } = useQuery({
     queryKey: ['audit', entity],
@@ -35,9 +37,9 @@ export default function AdminAuditPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h1 className="text-3xl font-semibold tracking-tight">Журнал аудита</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('admin_audit.heading')}</h1>
         <Input
-          placeholder="Фильтр по сущности (scenarios, equipment, users...)"
+          placeholder={t('admin_audit.filter_placeholder')}
           value={entity}
           onChange={(e) => setEntity(e.target.value)}
           className="w-80"
@@ -47,13 +49,13 @@ export default function AdminAuditPage() {
       {isLoading && <Spinner />}
 
       {data && data.length === 0 && (
-        <div className="text-muted-foreground">Событий нет. Сделай POST/PATCH/DELETE — запись появится.</div>
+        <div className="text-muted-foreground">{t('admin_audit.no_events')}</div>
       )}
 
       {data && data.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{data.length} последних записей (auto-refresh 5s)</CardTitle>
+            <CardTitle className="text-base">{t('admin_audit.recent_records', { count: data.length })}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-border max-h-[70vh] overflow-y-auto">

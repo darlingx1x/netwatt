@@ -60,19 +60,19 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
               <span>{t('dashboard.heading')}, {user?.full_name?.split(' ')[0]}</span>
               <span>·</span>
-              <span>5-летний горизонт</span>
+              <span>{t('dashboard.horizon_5y')}</span>
             </div>
             <div className="mt-3 flex items-baseline gap-3 flex-wrap">
               <div className="tabular-nums leading-none">
                 <AnimatedCounter value={cumFiveYears} fontSize={64} />
               </div>
-              <div className="text-lg text-muted-foreground">сум</div>
+              <div className="text-lg text-muted-foreground">{t('common.uzs')}</div>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <Badge variant="outline">{ready.length} рассчитано</Badge>
+              <Badge variant="outline">{t('dashboard.calculated_count', { count: ready.length })}</Badge>
               <span>·</span>
-              <span>EF_grid 0.468 кг CO₂/кВт·ч</span>
-              <span className="text-xs">(МЭ РУз 2024)</span>
+              <span>{t('dashboard.ef_grid_note')}</span>
+              <span className="text-xs">{t('dashboard.ef_grid_source')}</span>
             </div>
             <div className="mt-5 flex gap-2 flex-wrap">
               <Link to="/scenarios/new">
@@ -90,23 +90,23 @@ export default function DashboardPage() {
                 >
                   <Button variant="outline">
                     <GitCompare className="w-4 h-4 mr-1" />
-                    Сравнить топ-3
+                    {t('dashboard.compare_top3')}
                   </Button>
                 </Link>
               )}
               <Link to="/methodology">
                 <Button variant="outline">
                   <Info className="w-4 h-4 mr-1" />
-                  Методология
+                  {t('nav.methodology')}
                 </Button>
               </Link>
             </div>
           </div>
 
           <div className="grid grid-cols-3 md:grid-cols-1 gap-3 md:min-w-[180px] md:pl-6 md:border-l md:border-border">
-            <HeroMetric label="В год" value={totalMoney} unit="сум" />
-            <HeroMetric label="Энергия" value={totalKwh} unit="кВт·ч" />
-            <HeroMetric label="CO₂" value={totalCo2} unit="кг" />
+            <HeroMetric label={t('dashboard.per_year')} value={totalMoney} unit={t('common.uzs')} />
+            <HeroMetric label={t('dashboard.energy')} value={totalKwh} unit={t('common.kwh')} />
+            <HeroMetric label="CO₂" value={totalCo2} unit={t('common.kg')} />
           </div>
         </div>
       </div>
@@ -118,27 +118,27 @@ export default function DashboardPage() {
           <div className="grid gap-4 md:grid-cols-4">
             <StatCard
               icon={<Activity className="w-5 h-5 text-blue-600" />}
-              label="Сценариев"
+              label={t('dashboard.scenarios_count')}
               value={scenarios?.length ?? 0}
-              subline={`${ready.length} рассчитано`}
+              subline={t('dashboard.calculated_count', { count: ready.length })}
             />
             <StatCard
               icon={<Zap className="w-5 h-5 text-amber-500" />}
-              label="Экономия энергии / год"
+              label={t('dashboard.savings_energy_per_year')}
               value={totalKwh}
-              unit="кВт·ч"
+              unit={t('common.kwh')}
             />
             <StatCard
               icon={<DollarSign className="w-5 h-5 text-emerald-600" />}
-              label="Экономия средств / год"
+              label={t('dashboard.savings_money_per_year')}
               value={totalMoney}
-              unit="сум"
+              unit={t('common.uzs')}
             />
             <StatCard
               icon={<Leaf className="w-5 h-5 text-green-600" />}
-              label="Снижение CO₂ / год"
+              label={t('dashboard.savings_co2_per_year')}
               value={totalCo2}
-              unit="кг"
+              unit={t('common.kg')}
             />
           </div>
 
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                   <FolderKanban className="w-4 h-4" />
                   {t('nav.scenarios')}
                 </CardTitle>
-                <CardDescription>Создавайте и считайте проекты оптимизации</CardDescription>
+                <CardDescription>{t('dashboard.scenarios_card_desc')}</CardDescription>
               </CardHeader>
               <CardContent className="flex gap-2">
                 <Link to="/scenarios/new">
@@ -169,11 +169,11 @@ export default function DashboardPage() {
                   <BookOpen className="w-4 h-4" />
                   {t('nav.catalog')}
                 </CardTitle>
-                <CardDescription>50 моделей Cisco, HPE, Juniper, MikroTik, Dell, Ubiquiti…</CardDescription>
+                <CardDescription>{t('dashboard.catalog_card_desc')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Link to="/catalog">
-                  <Button variant="outline">Открыть</Button>
+                  <Button variant="outline">{t('common.open')}</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -181,18 +181,18 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <TrendingUp className="w-4 h-4" />
-                  Демо-золотой
+                  {t('dashboard.golden_card')}
                 </CardTitle>
-                <CardDescription>Эталон из ВКР: 120 портов, офис 8×5</CardDescription>
+                <CardDescription>{t('dashboard.golden_card_desc')}</CardDescription>
               </CardHeader>
               <CardContent>
                 {ready.length > 0 ? (
                   <Link to={`/scenarios/${ready[0].id}`}>
-                    <Button variant="outline">Открыть</Button>
+                    <Button variant="outline">{t('common.open')}</Button>
                   </Link>
                 ) : (
                   <Link to="/scenarios/new">
-                    <Button variant="outline">Создать</Button>
+                    <Button variant="outline">{t('common.create')}</Button>
                   </Link>
                 )}
               </CardContent>
@@ -202,7 +202,7 @@ export default function DashboardPage() {
           {recent.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Недавние сценарии</CardTitle>
+                <CardTitle className="text-base">{t('dashboard.recent_scenarios')}</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-border">
@@ -220,7 +220,7 @@ export default function DashboardPage() {
                       </div>
                       {s.result && (
                         <div className="text-sm font-mono">
-                          {Math.round(Number(s.result.savings_kwh)).toLocaleString()} кВт·ч
+                          {Math.round(Number(s.result.savings_kwh)).toLocaleString()} {t('common.kwh')}
                         </div>
                       )}
                       <Badge variant={s.status === 'ready' ? 'default' : 'outline'}>

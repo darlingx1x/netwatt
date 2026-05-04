@@ -58,7 +58,7 @@ export default function ScenariosPage() {
               }
             >
               <GitCompare className="w-4 h-4 mr-1" />
-              Сравнить ({selected.size})
+              {t('scenarios.compare', { count: selected.size })}
             </Button>
           )}
           <Link to="/scenarios/new">
@@ -112,7 +112,7 @@ export default function ScenariosPage() {
                               : 'bg-background text-foreground border-border hover:border-primary'
                           }`}
                           aria-pressed={isSelected}
-                          title={isSelected ? 'Убрать из сравнения' : 'Выбрать для сравнения'}
+                          title={isSelected ? t('scenarios.compare_unselect_hint') : t('scenarios.compare_select_hint')}
                         >
                           {isSelected ? <Check className="w-3 h-3" /> : null}
                           {t(`scenarios.status_${s.status}`)}
@@ -134,13 +134,13 @@ export default function ScenariosPage() {
                     {s.result && (
                       <div className="mt-2 flex gap-4">
                         <div>
-                          <div className="text-xs text-muted-foreground">кВт·ч/год</div>
+                          <div className="text-xs text-muted-foreground">{t('common.kwh_per_year')}</div>
                           <div className="font-semibold">
                             {Math.round(Number(s.result.savings_kwh)).toLocaleString()}
                           </div>
                         </div>
                         <div>
-                          <div className="text-xs text-muted-foreground">сум/год</div>
+                          <div className="text-xs text-muted-foreground">{t('common.uzs_per_year')}</div>
                           <div className="font-semibold">
                             {Math.round(Number(s.result.savings_money)).toLocaleString()}
                           </div>

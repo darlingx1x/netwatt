@@ -212,7 +212,7 @@ export default function WizardPage() {
                 onChange={(e) => setCategory(e.target.value)}
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm"
               >
-                <option value="">Все</option>
+                <option value="">{t('common.all')}</option>
                 <option value="access_switch">Access</option>
                 <option value="distribution_switch">Distribution</option>
                 <option value="core_switch">Core</option>
@@ -225,7 +225,7 @@ export default function WizardPage() {
 
             {selected.length > 0 && (
               <>
-                <div className="text-sm font-medium">Выбрано ({selected.length}):</div>
+                <div className="text-sm font-medium">{t('wizard.selected_count', { count: selected.length })}</div>
                 <div className="space-y-1">
                   {selected.map((s) => (
                     <div
@@ -309,7 +309,7 @@ export default function WizardPage() {
                   variant={preset === 'custom' ? 'default' : 'outline'}
                   onClick={() => setPreset('custom')}
                 >
-                  custom
+                  {t('wizard.preset_custom')}
                 </Button>
               </div>
             </div>

@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from weasyprint import HTML
 
 from netwatt.reports.i18n import translate
 from netwatt.scenarios.models import Scenario
@@ -40,6 +39,7 @@ def render_pdf(scenario: Scenario, owner: User, lang: str = "ru") -> bytes:
             "per_device": result.per_device,
         },
     )
+    from weasyprint import HTML  # lazy import: GTK runtime is optional on Windows
     return HTML(string=html).write_pdf() or b""
 
 

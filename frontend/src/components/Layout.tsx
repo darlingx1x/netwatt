@@ -69,7 +69,7 @@ export default function Layout(): ReactNode {
           {isAdmin && (
             <>
               <div className="pt-4 pb-1 px-3 text-xs font-semibold uppercase text-muted-foreground">
-                Admin
+                {t('nav.admin')}
               </div>
               {adminItems.map((item) => (
                 <NavLink
@@ -124,7 +124,7 @@ export default function Layout(): ReactNode {
             className="hidden md:flex items-center gap-2 h-8 px-3 rounded-md border border-border bg-card text-xs text-muted-foreground hover:text-foreground hover:border-foreground/20 transition min-w-[200px]"
           >
             <Command className="w-3.5 h-3.5" />
-            <span>Команды, сценарии…</span>
+            <span>{t('command_palette.trigger')}</span>
             <kbd className="ml-auto text-[10px] px-1 py-0.5 rounded bg-muted font-mono">⌘K</kbd>
           </button>
           <div className="ml-auto flex items-center gap-2">

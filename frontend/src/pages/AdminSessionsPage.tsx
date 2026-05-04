@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/api/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +17,7 @@ interface SessionItem {
 }
 
 export default function AdminSessionsPage() {
+  const { t } = useTranslation()
   const { data, isLoading } = useQuery({
     queryKey: ['sessions'],
     queryFn: async () => (await api.get<SessionItem[]>('/sessions')).data,
@@ -25,9 +27,9 @@ export default function AdminSessionsPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Сессии auth_tokens</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">{t('admin_sessions.heading')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Демонстрация подхода «токены в БД вместо JWT» — видно ротацию refresh, детект reuse, expires_at
+          {t('admin_sessions.subtitle')}
         </p>
       </div>
 
@@ -37,8 +39,11 @@ export default function AdminSessionsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              {data.length} токенов · {data.filter((s) => !s.revoked_at).length} активных ·{' '}
-              {data.filter((s) => s.revoked_at).length} revoked
+              {t('admin_sessions.stats', {
+                total: data.length,
+                active: data.filter((s) => !s.revoked_at).length,
+                revoked: data.filter((s) => s.revoked_at).length,
+              })}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -70,9 +75,9 @@ export default function AdminSessionsPage() {
                         </td>
                         <td className="p-3 font-mono text-xs">{s.ip ?? '—'}</td>
                         <td className="p-3">
-                          {active && <Badge>active</Badge>}
-                          {s.revoked_at && <Badge variant="destructive">revoked</Badge>}
-                          {expired && !s.revoked_at && <Badge variant="outline">expired</Badge>}
+                          {active && <Badge>{t('admin_sessions.active')}</Badge>}
+                          {s.revoked_at && <Badge variant="destructive">{t('admin_sessions.revoked')}</Badge>}
+                          {expired && !s.revoked_at && <Badge variant="outline">{t('admin_sessions.expired')}</Badge>}
                         </td>
                         <td className="p-3 text-xs text-muted-foreground">
                           {new Date(s.created_at).toLocaleString()}

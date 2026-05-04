@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface TrafficShape {
@@ -10,7 +11,6 @@ interface TrafficShape {
   night_hours: number
 }
 
-const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
 
 export function ConsumptionHeatmap({
@@ -20,6 +20,16 @@ export function ConsumptionHeatmap({
   traffic: TrafficShape
   avgKwhPerHour: number
 }) {
+  const { t } = useTranslation()
+  const DAYS = [
+    t('weekday.mon'),
+    t('weekday.tue'),
+    t('weekday.wed'),
+    t('weekday.thu'),
+    t('weekday.fri'),
+    t('weekday.sat'),
+    t('weekday.sun'),
+  ]
   const cells = useMemo(() => {
     const grid: { day: number; hour: number; value: number }[] = []
     for (let d = 0; d < 7; d++) {
@@ -47,7 +57,7 @@ export function ConsumptionHeatmap({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Тепловая карта потребления · 24 × 7</CardTitle>
+        <CardTitle className="text-base">{t('result.heatmap')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex gap-2">
@@ -63,7 +73,7 @@ export function ConsumptionHeatmap({
                   key={i}
                   className="h-5 rounded-sm"
                   style={{ background: color(c.value) }}
-                  title={`${DAYS[c.day]} ${String(c.hour).padStart(2, '0')}:00 · ${c.value.toFixed(2)} кВт·ч`}
+                  title={`${DAYS[c.day]} ${String(c.hour).padStart(2, '0')}:00 · ${c.value.toFixed(2)} ${t('common.kwh')}`}
                 />
               ))}
             </div>
@@ -75,7 +85,7 @@ export function ConsumptionHeatmap({
           </div>
         </div>
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <span>Меньше</span>
+          <span>{t('common.less')}</span>
           <div className="flex gap-0.5">
             {[0, 0.2, 0.4, 0.6, 0.8, 1].map((v) => (
               <span
@@ -85,9 +95,9 @@ export function ConsumptionHeatmap({
               />
             ))}
           </div>
-          <span>Больше</span>
+          <span>{t('common.more')}</span>
           <span className="ml-auto">
-            Пик: <span className="font-mono text-foreground">{max.toFixed(2)}</span> кВт·ч/ч
+            {t('result.heatmap_peak')} <span className="font-mono text-foreground">{max.toFixed(2)}</span> {t('common.kwh_per_hour')}
           </span>
         </div>
       </CardContent>
